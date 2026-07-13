@@ -2,6 +2,7 @@ numpy
 pandas
 scipy
 matplotlib
+tabulate
 yfinance
 numpy-financial
 cvxpy

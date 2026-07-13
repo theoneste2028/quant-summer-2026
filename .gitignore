@@ -30,3 +30,6 @@ logs/
 .DS_Store
 .vscode/
 .idea/
+
+# Archives
+*.zip
