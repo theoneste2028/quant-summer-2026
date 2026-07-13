@@ -1,22 +1,28 @@
 # Portfolio Database & SQL Analytics
 
-> **Course:** CS 217 · **Weeks:** 5-6 · **Status:** In progress
+> **Course:** CS 217 · **Weeks:** 5-6 · **Status:** ✅ Week 5 complete, Week 6 pending
 
 ## Problem
-Portfolio data scattered across brokerage exports is unqueryable and error-prone. A normalized SQLite schema with constraints becomes the single source of truth, powering FIFO P&L, sector exposure, and time-series analytics in SQL.
+Portfolio data scattered across brokerage exports is unqueryable and error-prone.
+A normalized SQLite schema with constraints becomes the single source of truth.
 
-## Approach
-<!-- 3-5 bullets: what you built and how. Fill in as you go. -->
-
-## Results
-<!-- Your best chart goes here. Quantify: error rates, speedups, probabilities. -->
-![key result](results/key_result.png)
+## Approach (Week 5)
+- 3NF schema: securities, trades, prices, dividends (see `sql/schema.sql`).
+- Constraints as data quality: CHECKs, FKs, composite PKs.
+- Fidelity CSV parser handling junk headers, signed/fractional quantities.
+- Transactional loading with rollback; yfinance price backfill.
 
 ## How to run
 ```bash
-# from repo root, with venv active
-jupyter notebook projects/05-portfolio-database/
+cd projects/05-portfolio-database
+python build_db.py --demo                    # offline demo (sample CSV + synthetic prices)
+python build_db.py ~/Downloads/activity.csv  # real: your Fidelity export + live backfill
 ```
+DB lands at `data/portfolio.db` (gitignored). Browse with the SQLite Viewer extension.
 
-## What I learned
-<!-- 2-3 sentences. This is the part recruiters actually read. -->
+## Files
+- `sql/schema.sql` — schema with constraints
+- `sql/er_diagram.mermaid` — ER diagram (render at mermaid.live or recreate in Lucidchart)
+- `build_db.py` — parser + loader + backfill + constraint verification
+- `sample_fidelity.csv` — sample in the real Fidelity format
+- `WEEK5_SUMMARY.md` — writeup

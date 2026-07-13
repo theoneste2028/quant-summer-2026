@@ -1,0 +1,30 @@
+erDiagram
+    securities ||--o{ trades : "has"
+    securities ||--o{ prices : "has"
+    securities ||--o{ dividends : "pays"
+    securities {
+        TEXT ticker PK
+        TEXT name
+        TEXT sector
+        TEXT asset_type
+    }
+    trades {
+        INTEGER trade_id PK
+        TEXT ticker FK
+        TEXT trade_date
+        TEXT side "BUY or SELL"
+        REAL quantity "abs, fractional OK"
+        REAL price
+        REAL fees
+    }
+    prices {
+        TEXT ticker PK, FK
+        TEXT date PK
+        REAL close "plus open, high, low"
+        INTEGER volume
+    }
+    dividends {
+        TEXT ticker PK, FK
+        TEXT ex_date PK
+        REAL amount "per share"
+    }
