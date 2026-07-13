@@ -1,0 +1,9 @@
+numpy
+pandas
+scipy
+matplotlib
+yfinance
+numpy-financial
+cvxpy
+pymongo
+jupyter

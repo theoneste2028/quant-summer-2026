@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.ipynb_checkpoints/
+
+# Data & databases — never commit market data or your personal trades
+data/*
+!data/.gitkeep
+!data/README.md
+*.db
+*.sqlite
+*.sqlite3
+*.csv
+*.parquet
+
+# Secrets & environment
+.env
+*.pem
+
+# Logs
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
