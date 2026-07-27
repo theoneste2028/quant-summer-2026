@@ -5,8 +5,8 @@ erDiagram
     securities {
         TEXT ticker PK
         TEXT name
-        TEXT sector
-        TEXT asset_type
+        TEXT sector "NULL for funds; category used instead"
+        TEXT asset_type "STOCK/ETF/FUND/BOND/OTHER"
     }
     trades {
         INTEGER trade_id PK
@@ -16,6 +16,7 @@ erDiagram
         REAL quantity "abs, fractional OK"
         REAL price
         REAL fees
+        TEXT source_ref UK "idempotency key"
     }
     prices {
         TEXT ticker PK, FK
@@ -26,5 +27,5 @@ erDiagram
     dividends {
         TEXT ticker PK, FK
         TEXT ex_date PK
-        REAL amount "per share"
+        REAL amount "total cash received, USD"
     }

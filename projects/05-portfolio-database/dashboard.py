@@ -1,0 +1,191 @@
+"""
+Week 6 — Portfolio Analytics Dashboard
+======================================
+Runs the queries in `sql/queries.sql` against the portfolio database and
+prints/plots the results. The SQL is the deliverable; this file is only a
+runner, so that every number shown here is traceable to a query you can read.
+
+Run:
+    python dashboard.py                  # every query, plus charts
+    python dashboard.py positions        # one query by name
+    python dashboard.py --list           # show available query names
+    python dashboard.py --db other.db    # point at a different database
+"""
+from __future__ import annotations
+import os, re, sys, sqlite3
+import pandas as pd
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.abspath(os.path.join(HERE, "..", ".."))
+DB_PATH = os.path.join(REPO, "data", "portfolio.db")
+QUERIES = os.path.join(HERE, "sql", "queries.sql")
+RESULTS_DIR = os.path.join(HERE, "results")
+
+
+def load_queries(path=QUERIES) -> dict:
+    """Split queries.sql into {name: sql} on its `-- name: <id>` markers."""
+    with open(path) as fh:
+        text = fh.read()
+    parts = re.split(r"^--\s*name:\s*(\w+)\s*$", text, flags=re.MULTILINE)
+    # parts = [preamble, name1, body1, name2, body2, ...]
+    return {parts[i]: parts[i + 1].strip() for i in range(1, len(parts) - 1, 2)}
+
+
+def run(con, sql: str) -> pd.DataFrame:
+    return pd.read_sql_query(sql, con)
+
+
+def _fmt(df: pd.DataFrame, max_rows=15) -> str:
+    with pd.option_context("display.width", 200, "display.max_columns", 40):
+        if len(df) > max_rows:
+            return (df.head(max_rows).to_string(index=False)
+                    + f"\n  ... {len(df) - max_rows} more rows")
+        return df.to_string(index=False)
+
+
+# ---------------------------------------------------------------------------
+# Charts
+# ---------------------------------------------------------------------------
+def make_charts(results: dict, outdir=RESULTS_DIR):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    os.makedirs(outdir, exist_ok=True)
+
+    pv = results.get("portfolio_value")
+    if pv is not None and not pv.empty:
+        fig, ax = plt.subplots(figsize=(10, 5))
+        d = pd.to_datetime(pv["date"])
+        ax.plot(d, pv["portfolio_value"], color="0.25", lw=1.4)
+        ax.fill_between(d, pv["portfolio_value"], color="0.75", alpha=0.4)
+        ax.set_title("Portfolio market value over time")
+        ax.set_xlabel("Date"); ax.set_ylabel("Value ($)")
+        ax.grid(alpha=0.3)
+        fig.autofmt_xdate(); fig.tight_layout()
+        fig.savefig(os.path.join(outdir, "portfolio_value.png"), dpi=130)
+        plt.close(fig)
+
+    se = results.get("sector_exposure")
+    if se is not None and not se.empty:
+        fig, ax = plt.subplots(figsize=(9, 5))
+        top = se.head(12).iloc[::-1]
+        ax.barh(top["sector"], top["pct_of_portfolio"], color="0.5")
+        ax.set_xlabel("% of portfolio"); ax.set_title("Sector exposure")
+        for y, v in enumerate(top["pct_of_portfolio"]):
+            ax.text(v + 0.3, y, f"{v:.1f}%", va="center", fontsize=8)
+        ax.grid(axis="x", alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(os.path.join(outdir, "sector_exposure.png"), dpi=130)
+        plt.close(fig)
+
+    rp = results.get("realized_pnl")
+    if rp is not None and not rp.empty:
+        top = pd.concat([rp.head(10), rp.tail(10)]).drop_duplicates("ticker")
+        top = top.sort_values("realized_pnl")
+        fig, ax = plt.subplots(figsize=(9, 6))
+        colors = ["0.65" if v >= 0 else "0.3" for v in top["realized_pnl"]]
+        ax.barh(top["ticker"], top["realized_pnl"], color=colors)
+        ax.axvline(0, color="black", lw=1)
+        ax.set_xlabel("Realized P&L ($, FIFO, net of fees)")
+        ax.set_title("Best and worst closed positions")
+        ax.grid(axis="x", alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(os.path.join(outdir, "realized_pnl.png"), dpi=130)
+        plt.close(fig)
+
+    dq = results.get("dividends_by_quarter")
+    if dq is not None and not dq.empty:
+        fig, ax = plt.subplots(figsize=(8, 4.5))
+        labels = dq["year"].astype(str) + " " + dq["quarter"]
+        ax.bar(labels, dq["income"], color="0.5")
+        ax.set_ylabel("Income ($)"); ax.set_title("Dividend & interest income by quarter")
+        for i, v in enumerate(dq["income"]):
+            ax.text(i, v, f"${v:,.0f}", ha="center", va="bottom", fontsize=8)
+        ax.grid(axis="y", alpha=0.3)
+        fig.tight_layout()
+        fig.savefig(os.path.join(outdir, "dividends_by_quarter.png"), dpi=130)
+        plt.close(fig)
+
+
+def write_markdown(results: dict, outdir=RESULTS_DIR):
+    os.makedirs(outdir, exist_ok=True)
+    order = ["positions", "cost_basis", "realized_pnl", "sector_exposure",
+             "best_worst_days", "dividends_by_quarter", "dividends_by_ticker"]
+    lines = ["# Week 6 — Portfolio Analytics Results\n",
+             "_Generated by `dashboard.py` from `sql/queries.sql`._\n"]
+    for name in order:
+        df = results.get(name)
+        if df is None or df.empty:
+            continue
+        lines.append(f"\n## {name}\n")
+        lines.append(df.head(20).to_markdown(index=False))
+        if len(df) > 20:
+            lines.append(f"\n_{len(df) - 20} further rows omitted._")
+        lines.append("")
+    with open(os.path.join(outdir, "results_table.md"), "w") as fh:
+        fh.write("\n".join(lines))
+
+
+# ---------------------------------------------------------------------------
+def main(argv):
+    db = DB_PATH
+    if "--db" in argv:
+        i = argv.index("--db"); db = argv[i + 1]; del argv[i:i + 2]
+    queries = load_queries()
+
+    if "--list" in argv:
+        print("Available queries:")
+        for k in queries:
+            print("  ", k)
+        return 0
+    if not os.path.exists(db):
+        print(f"No database at {db}. Build it first:\n"
+              f"  python build_db.py <fidelity_export.csv>")
+        return 1
+
+    wanted = [a for a in argv if not a.startswith("-")]
+    names = wanted or list(queries)
+    unknown = [n for n in names if n not in queries]
+    if unknown:
+        print(f"Unknown query name(s): {', '.join(unknown)}")
+        print(f"Available: {', '.join(queries)}")
+        return 1
+
+    con = sqlite3.connect(db)
+    con.execute("PRAGMA foreign_keys = ON")
+    results = {}
+    for name in names:
+        df = run(con, queries[name])
+        results[name] = df
+        print(f"\n{'='*78}\n{name}  ({len(df)} rows)\n{'='*78}")
+        print(_fmt(df))
+
+    # Headline reconciliation: the numbers a person actually wants.
+    if {"cost_basis", "realized_pnl"} <= set(results):
+        cb, rp = results["cost_basis"], results["realized_pnl"]
+        mv = cb["market_value"].sum(skipna=True)
+        cost = cb["cost_basis"].sum()
+        unreal = cb["unrealized_pnl"].sum(skipna=True)
+        real = rp["realized_pnl"].sum()
+        div = results.get("dividends_by_quarter")
+        inc = div["income"].sum() if div is not None and not div.empty else 0.0
+        print(f"\n{'='*78}\nPORTFOLIO SUMMARY\n{'='*78}")
+        print(f"  Open positions        {len(cb):>12,}")
+        print(f"  Cost basis (FIFO)     {cost:>12,.2f}")
+        print(f"  Market value          {mv:>12,.2f}")
+        print(f"  Unrealized P&L        {unreal:>12,.2f}")
+        print(f"  Realized P&L (FIFO)   {real:>12,.2f}")
+        print(f"  Dividend income       {inc:>12,.2f}")
+        print(f"  {'-'*44}")
+        print(f"  Total P&L             {unreal + real + inc:>12,.2f}")
+
+    if not wanted:
+        make_charts(results)
+        write_markdown(results)
+        print(f"\nCharts + results table written to: {RESULTS_DIR}")
+    con.close()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

@@ -1,0 +1,312 @@
+{
+ "44984F807": {
+  "asset_type": "OTHER",
+  "name": null,
+  "sector": null
+ },
+ "AGX": {
+  "asset_type": "STOCK",
+  "name": "Argan, Inc.",
+  "sector": "Industrials"
+ },
+ "AMPX": {
+  "asset_type": "STOCK",
+  "name": "Amprius Technologies, Inc.",
+  "sector": "Industrials"
+ },
+ "ASTS": {
+  "asset_type": "STOCK",
+  "name": "AST SpaceMobile, Inc.",
+  "sector": "Technology"
+ },
+ "ASTX": {
+  "asset_type": "ETF",
+  "name": "Tradr 2X Long ASTS Daily ETF",
+  "sector": "Trading--Leveraged Equity"
+ },
+ "AVL": {
+  "asset_type": "ETF",
+  "name": "Direxion Daily AVGO Bull 2X ETF",
+  "sector": "Trading--Leveraged Equity"
+ },
+ "CIFR": {
+  "asset_type": "STOCK",
+  "name": "Cipher Digital Inc.",
+  "sector": "Technology"
+ },
+ "CLNN": {
+  "asset_type": "STOCK",
+  "name": "Clene Inc.",
+  "sector": "Consumer Defensive"
+ },
+ "EOSE": {
+  "asset_type": "STOCK",
+  "name": "Eos Energy Enterprises, Inc.",
+  "sector": "Industrials"
+ },
+ "FDVV": {
+  "asset_type": "ETF",
+  "name": "Fidelity High Dividend ETF",
+  "sector": "Large Value"
+ },
+ "FLNC": {
+  "asset_type": "STOCK",
+  "name": "Fluence Energy, Inc.",
+  "sector": "Utilities"
+ },
+ "FSPGX": {
+  "asset_type": "FUND",
+  "name": "Fidelity Large Cap Growth Index",
+  "sector": null
+ },
+ "FXAIX": {
+  "asset_type": "FUND",
+  "name": "Fidelity 500 Index Fund",
+  "sector": null
+ },
+ "GGLL": {
+  "asset_type": "ETF",
+  "name": "Direxion Daily GOOGL Bull 2X ET",
+  "sector": "Trading--Leveraged Equity"
+ },
+ "GOOGL": {
+  "asset_type": "STOCK",
+  "name": "Alphabet Inc.",
+  "sector": "Communication Services"
+ },
+ "HIMS": {
+  "asset_type": "STOCK",
+  "name": "Hims & Hers Health, Inc.",
+  "sector": "Healthcare"
+ },
+ "HOOD": {
+  "asset_type": "STOCK",
+  "name": "Robinhood Markets, Inc.",
+  "sector": "Financial Services"
+ },
+ "HOVR": {
+  "asset_type": "STOCK",
+  "name": "New Horizon Aircraft Ltd.",
+  "sector": "Industrials"
+ },
+ "IMSR": {
+  "asset_type": "STOCK",
+  "name": "Terrestrial Energy Inc.",
+  "sector": "Utilities"
+ },
+ "IREN": {
+  "asset_type": "STOCK",
+  "name": "IREN LIMITED",
+  "sector": "Financial Services"
+ },
+ "IREX": {
+  "asset_type": "ETF",
+  "name": "Tradr 2X Long IREN Daily ETF",
+  "sector": "Trading--Leveraged Equity"
+ },
+ "ITA": {
+  "asset_type": "ETF",
+  "name": "iShares U.S. Aerospace & Defens",
+  "sector": "Industrials"
+ },
+ "KOPN": {
+  "asset_type": "STOCK",
+  "name": "Kopin Corporation",
+  "sector": "Technology"
+ },
+ "KRKNF": {
+  "asset_type": "STOCK",
+  "name": "Kraken Robotics Inc.",
+  "sector": "Technology"
+ },
+ "KTOS": {
+  "asset_type": "STOCK",
+  "name": "Kratos Defense & Security Solut",
+  "sector": "Industrials"
+ },
+ "LAC": {
+  "asset_type": "STOCK",
+  "name": "Lithium Americas Corp.",
+  "sector": "Basic Materials"
+ },
+ "LUNL": {
+  "asset_type": "ETF",
+  "name": "Defiance Daily Target 2X Long L",
+  "sector": "Trading--Leveraged Equity"
+ },
+ "LUNR": {
+  "asset_type": "STOCK",
+  "name": "Intuitive Machines, Inc.",
+  "sector": "Industrials"
+ },
+ "MU": {
+  "asset_type": "STOCK",
+  "name": "Micron Technology, Inc.",
+  "sector": "Technology"
+ },
+ "NBIG": {
+  "asset_type": "ETF",
+  "name": "Leverage Shares 2X Long NBIS Da",
+  "sector": "Trading--Leveraged Equity"
+ },
+ "NBIS": {
+  "asset_type": "STOCK",
+  "name": "Nebius Group N.V.",
+  "sector": "Communication Services"
+ },
+ "NOWL": {
+  "asset_type": "ETF",
+  "name": "GraniteShares 2x Long NOW Daily",
+  "sector": "Trading--Leveraged Equity"
+ },
+ "NUAI": {
+  "asset_type": "STOCK",
+  "name": "New Era Energy & Digital, Inc.",
+  "sector": "Technology"
+ },
+ "NVAX": {
+  "asset_type": "STOCK",
+  "name": "Novavax, Inc.",
+  "sector": "Healthcare"
+ },
+ "NVDA": {
+  "asset_type": "STOCK",
+  "name": "NVIDIA Corporation",
+  "sector": "Technology"
+ },
+ "NVTS": {
+  "asset_type": "STOCK",
+  "name": "Navitas Semiconductor Corporati",
+  "sector": "Technology"
+ },
+ "NVTX": {
+  "asset_type": "ETF",
+  "name": "Tradr 2X Long NVTS Daily ETF",
+  "sector": "Trading--Leveraged Equity"
+ },
+ "OKLO": {
+  "asset_type": "STOCK",
+  "name": "Oklo Inc.",
+  "sector": "Utilities"
+ },
+ "ONDS": {
+  "asset_type": "STOCK",
+  "name": "Ondas Inc",
+  "sector": "Technology"
+ },
+ "OPEN": {
+  "asset_type": "STOCK",
+  "name": "Opendoor Technologies Inc",
+  "sector": "Real Estate"
+ },
+ "OSS": {
+  "asset_type": "STOCK",
+  "name": "One Stop Systems, Inc.",
+  "sector": "Technology"
+ },
+ "OUST": {
+  "asset_type": "STOCK",
+  "name": "Ouster, Inc.",
+  "sector": "Technology"
+ },
+ "PL": {
+  "asset_type": "STOCK",
+  "name": "Planet Labs PBC",
+  "sector": "Industrials"
+ },
+ "PLTR": {
+  "asset_type": "STOCK",
+  "name": "Palantir Technologies Inc.",
+  "sector": "Technology"
+ },
+ "POET": {
+  "asset_type": "STOCK",
+  "name": "POET Technologies Inc.",
+  "sector": "Technology"
+ },
+ "QQQM": {
+  "asset_type": "ETF",
+  "name": "Invesco NASDAQ 100 ETF",
+  "sector": "Large Growth"
+ },
+ "RKLB": {
+  "asset_type": "STOCK",
+  "name": "Rocket Lab Corporation",
+  "sector": "Industrials"
+ },
+ "RR": {
+  "asset_type": "STOCK",
+  "name": "Richtech Robotics Inc.",
+  "sector": "Industrials"
+ },
+ "SMH": {
+  "asset_type": "ETF",
+  "name": "VanEck Semiconductor ETF",
+  "sector": "Technology"
+ },
+ "SOFI": {
+  "asset_type": "STOCK",
+  "name": "SoFi Technologies, Inc.",
+  "sector": "Financial Services"
+ },
+ "SOXQ": {
+  "asset_type": "ETF",
+  "name": "Invesco PHLX Semiconductor ETF",
+  "sector": "Technology"
+ },
+ "SOXX": {
+  "asset_type": "ETF",
+  "name": "iShares PHLX SOX Semiconductor ",
+  "sector": "Technology"
+ },
+ "SPAXX": {
+  "asset_type": "OTHER",
+  "name": "Fidelity Government Money Marke",
+  "sector": null
+ },
+ "SPYM": {
+  "asset_type": "STOCK",
+  "name": "State Street SPDR Portfolio S&P",
+  "sector": null
+ },
+ "T": {
+  "asset_type": "STOCK",
+  "name": "AT&T Inc.",
+  "sector": "Communication Services"
+ },
+ "TE": {
+  "asset_type": "STOCK",
+  "name": "T1 Energy Inc.",
+  "sector": "Industrials"
+ },
+ "TQQQ": {
+  "asset_type": "ETF",
+  "name": "ProShares UltraPro QQQ",
+  "sector": "Trading--Leveraged Equity"
+ },
+ "UAMY": {
+  "asset_type": "STOCK",
+  "name": "United States Antimony Corporat",
+  "sector": "Basic Materials"
+ },
+ "UUUU": {
+  "asset_type": "STOCK",
+  "name": "Energy Fuels Inc",
+  "sector": "Energy"
+ },
+ "VOO": {
+  "asset_type": "ETF",
+  "name": "Vanguard S&P 500 ETF",
+  "sector": "Large Blend"
+ },
+ "VXUS": {
+  "asset_type": "ETF",
+  "name": "Vanguard Total International St",
+  "sector": "Foreign Large Blend"
+ },
+ "ZETA": {
+  "asset_type": "STOCK",
+  "name": "Zeta Global Holdings Corp.",
+  "sector": "Technology"
+ }
+}

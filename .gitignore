@@ -33,3 +33,8 @@ logs/
 
 # Archives
 *.zip
+
+# Week 6 analytics output — contains real position sizes, cost basis and P&L.
+# Excluded by default because this repo is intended to be shown publicly.
+# Remove these two lines if you decide the numbers are fine to publish.
+projects/05-portfolio-database/results/
