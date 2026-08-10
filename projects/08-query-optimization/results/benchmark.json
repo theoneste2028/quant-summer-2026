@@ -1,0 +1,244 @@
+{
+ "n_rows": 2964624,
+ "before": {
+  "Q1 point lookup": {
+   "mean_ms": 93.65395839995472,
+   "min_ms": 93.20100000331877,
+   "max_ms": 94.74429200054146,
+   "rows": 1,
+   "result": [
+    [
+     145240,
+     59.4
+    ]
+   ],
+   "plan": "SCAN trips",
+   "scan": "FULL SCAN"
+  },
+  "Q2 date range scan": {
+   "mean_ms": 105.49999159848085,
+   "min_ms": 102.97720799280796,
+   "max_ms": 113.41433399502421,
+   "rows": 1,
+   "result": [
+    [
+     77033,
+     2165047.64
+    ]
+   ],
+   "plan": "SCAN trips",
+   "scan": "FULL SCAN"
+  },
+  "Q3 group-by aggregation": {
+   "mean_ms": 422.14277499879245,
+   "min_ms": 416.5980000034324,
+   "max_ms": 431.07995799800847,
+   "rows": 5,
+   "result": [
+    [
+     1,
+     2319046,
+     18.56
+    ],
+    [
+     2,
+     439191,
+     17.87
+    ],
+    [
+     0,
+     140162,
+     20.02
+    ]
+   ],
+   "plan": "SCAN trips | USE TEMP B-TREE FOR GROUP BY | USE TEMP B-TREE FOR ORDER BY",
+   "scan": "FULL SCAN"
+  },
+  "Q4 join to zone lookup": {
+   "mean_ms": 130.86399159947177,
+   "min_ms": 129.95000000228174,
+   "max_ms": 131.87174999620765,
+   "rows": 10,
+   "result": [
+    [
+     "JFK Airport",
+     7252
+    ],
+    [
+     "Outside of NYC",
+     6011
+    ],
+    [
+     "Times Sq/Theatre District",
+     5859
+    ]
+   ],
+   "plan": "SCAN t | SEARCH z USING INTEGER PRIMARY KEY (rowid=?) | USE TEMP B-TREE FOR GROUP BY | USE TEMP B-TREE FOR ORDER BY",
+   "scan": "FULL SCAN"
+  },
+  "Q5 filtered sort": {
+   "mean_ms": 96.48649199807551,
+   "min_ms": 96.06754199921852,
+   "max_ms": 96.74845900008222,
+   "rows": 20,
+   "result": [
+    [
+     "2024-01-10 13:46:13",
+     420.9,
+     60.0
+    ],
+    [
+     "2024-01-15 20:58:14",
+     399.9,
+     61.7
+    ],
+    [
+     "2024-01-16 08:42:42",
+     339.7,
+     56.71
+    ]
+   ],
+   "plan": "SCAN trips | USE TEMP B-TREE FOR ORDER BY",
+   "scan": "FULL SCAN"
+  }
+ },
+ "after": {
+  "Q1 point lookup": {
+   "mean_ms": 43.47029179916717,
+   "min_ms": 42.86166700330796,
+   "max_ms": 43.67308400105685,
+   "rows": 1,
+   "result": [
+    [
+     145240,
+     59.4
+    ]
+   ],
+   "plan": "SEARCH trips USING INDEX idx_trips_pu (pu_location_id=?)",
+   "scan": "INDEX SEEK"
+  },
+  "Q2 date range scan": {
+   "mean_ms": 13.346466798975598,
+   "min_ms": 13.215708997449838,
+   "max_ms": 13.518792002287228,
+   "rows": 1,
+   "result": [
+    [
+     77033,
+     2165047.64
+    ]
+   ],
+   "plan": "SEARCH trips USING INDEX idx_trips_pickup (pickup_ts>? AND pickup_ts<?)",
+   "scan": "INDEX SEEK"
+  },
+  "Q3 group-by aggregation": {
+   "mean_ms": 295.84448319947114,
+   "min_ms": 295.5705409985967,
+   "max_ms": 296.0954579975805,
+   "rows": 5,
+   "result": [
+    [
+     1,
+     2319046,
+     18.56
+    ],
+    [
+     2,
+     439191,
+     17.87
+    ],
+    [
+     0,
+     140162,
+     20.02
+    ]
+   ],
+   "plan": "SCAN trips USING INDEX idx_trips_payment | USE TEMP B-TREE FOR ORDER BY",
+   "scan": "INDEX SCAN"
+  },
+  "Q4 join to zone lookup": {
+   "mean_ms": 76.71681699866895,
+   "min_ms": 76.25895900127944,
+   "max_ms": 77.67674999922747,
+   "rows": 10,
+   "result": [
+    [
+     "JFK Airport",
+     7252
+    ],
+    [
+     "Outside of NYC",
+     6011
+    ],
+    [
+     "Times Sq/Theatre District",
+     5859
+    ]
+   ],
+   "plan": "SEARCH t USING INDEX idx_trips_pu (pu_location_id=?) | SEARCH z USING INTEGER PRIMARY KEY (rowid=?) | USE TEMP B-TREE FOR GROUP BY | USE TEMP B-TREE FOR ORDER BY",
+   "scan": "INDEX SEEK"
+  },
+  "Q5 filtered sort": {
+   "mean_ms": 9.62173319858266,
+   "min_ms": 9.292624999943655,
+   "max_ms": 9.820082996156998,
+   "rows": 20,
+   "result": [
+    [
+     "2024-01-10 13:46:13",
+     420.9,
+     60.0
+    ],
+    [
+     "2024-01-15 20:58:14",
+     399.9,
+     61.7
+    ],
+    [
+     "2024-01-16 08:42:42",
+     339.7,
+     56.71
+    ]
+   ],
+   "plan": "SEARCH trips USING INDEX idx_trips_pu_pickup (pu_location_id=? AND pickup_ts>? AND pickup_ts<?) | USE TEMP B-TREE FOR ORDER BY",
+   "scan": "INDEX SEEK"
+  }
+ },
+ "build_times": {
+  "idx_trips_pu": 0.5044521669988171,
+  "idx_trips_pickup": 0.7066132499967352,
+  "idx_trips_pu_pickup": 0.9540010830023675,
+  "idx_trips_payment": 0.3916212500043912
+ },
+ "repeat": 5,
+ "size_before_mb": 268.066816,
+ "size_after_mb": 502.64064,
+ "write_cost": {
+  "rows": 20000,
+  "plain_ms": 9.50520799960941,
+  "indexed_ms": 35.799958001007326,
+  "ratio": 3.7663518780944534
+ },
+ "composite": {
+  "filter pu_location_id (low cardinality, ~260 values) | (pu_location_id, pickup_ts)  leading matches": {
+   "mean_ms": 51.09341679926729,
+   "scan": "INDEX SEEK",
+   "plan": "SEARCH trips USING INDEX ix_c (pu_location_id=?)"
+  },
+  "filter pu_location_id (low cardinality, ~260 values) | (pickup_ts, pu_location_id)  leading does NOT match": {
+   "mean_ms": 94.92463299975498,
+   "scan": "FULL SCAN",
+   "plan": "SCAN trips"
+  },
+  "filter pickup_ts (high cardinality, ~1575706 values) | (pickup_ts, pu_location_id)  leading matches": {
+   "mean_ms": 13.773533199855592,
+   "scan": "INDEX SEEK",
+   "plan": "SEARCH trips USING INDEX ix_c (pickup_ts>? AND pickup_ts<?)"
+  },
+  "filter pickup_ts (high cardinality, ~1575706 values) | (pu_location_id, pickup_ts)  leading does NOT match": {
+   "mean_ms": 30.457291600760072,
+   "scan": "INDEX SKIP-SCAN",
+   "plan": "SEARCH trips USING INDEX ix_c (ANY(pu_location_id) AND pickup_ts>? AND pickup_ts<?)"
+  }
+ }
+}
