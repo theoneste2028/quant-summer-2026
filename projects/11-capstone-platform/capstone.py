@@ -86,6 +86,26 @@ def load_returns(db_path=DB_PATH, min_days=400, extra=None) -> dict:
     excluded = {t: counts.get(t, 0) for t in held + candidates
                 if counts.get(t, 0) < min_days}
 
+    # Fail with an explanation rather than an IndexError twenty lines later.
+    # The common way to reach this is running the capstone against the offline
+    # demo database, which holds a handful of tickers and ~130 synthetic days —
+    # far too little to estimate a covariance matrix from.
+    if len(universe) < 2:
+        con.close()
+        raise SystemExit(
+            f"\nNot enough price history in {os.path.basename(db_path)} to run "
+            f"the optimizer.\n"
+            f"  Found {len(universe)} of {len(held) + len(candidates)} tickers "
+            f"with at least {min_days} days of prices.\n"
+            + (f"  Excluded: "
+               + ", ".join(f"{t} ({n}d)" for t, n in sorted(excluded.items())[:8])
+               + "\n" if excluded else "")
+            + "\nThe capstone needs a real brokerage history. Build one with:\n"
+              "  python projects/05-portfolio-database/build_db.py "
+              "<your_export.csv>\n"
+              "The --demo database is intentionally tiny and cannot support "
+              "this step.\n")
+
     rows = con.execute(
         f"SELECT ticker, date, close FROM prices WHERE ticker IN "
         f"({','.join('?' * len(universe))}) ORDER BY date",
