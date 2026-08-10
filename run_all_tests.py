@@ -30,6 +30,7 @@ SUITES = [
     ("W8 index benchmark",      "08-query-optimization", "test_benchmark.py", [], True),
     ("W9 capital budgeting",    "09-capital-budgeting", "test_capital_budgeting.py", [], False),
     ("W10 decision analysis",   "10-decision-analysis", "test_decision_analysis.py", [], False),
+    ("W11 capstone",            "11-capstone-platform", "test_capstone.py", [], True),
 ]
 
 # "N passed, M failed" or the ACID demo's "N/M demonstrations"

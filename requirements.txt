@@ -1,10 +1,24 @@
+# Core numerics
 numpy
 pandas
 scipy
 matplotlib
 tabulate
+
+# Market data
 yfinance
+
+# Weeks 8-9: parquet loading, financial functions
+pyarrow
 numpy-financial
+
+# Week 11: convex optimization
 cvxpy
+
+# Week 7: MongoDB. pymongo talks to a real server; mongomock stands in when
+# none is running, so the SQL/NoSQL comparison is reproducible offline.
 pymongo
+mongomock
+
+# Notebooks
 jupyter

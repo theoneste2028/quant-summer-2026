@@ -29,6 +29,11 @@
   "name": "Direxion Daily AVGO Bull 2X ETF",
   "sector": "Trading--Leveraged Equity"
  },
+ "BND": {
+  "asset_type": "ETF",
+  "name": "Vanguard Total Bond Market ETF",
+  "sector": "Intermediate Core Bond"
+ },
  "CIFR": {
   "asset_type": "STOCK",
   "name": "Cipher Digital Inc.",
@@ -68,6 +73,11 @@
   "asset_type": "ETF",
   "name": "Direxion Daily GOOGL Bull 2X ET",
   "sector": "Trading--Leveraged Equity"
+ },
+ "GLD": {
+  "asset_type": "ETF",
+  "name": "SPDR Gold Shares",
+  "sector": "Commodities Focused"
  },
  "GOOGL": {
   "asset_type": "STOCK",
@@ -239,6 +249,11 @@
   "name": "Richtech Robotics Inc.",
   "sector": "Industrials"
  },
+ "SCHD": {
+  "asset_type": "ETF",
+  "name": "Schwab US Dividend Equity ETF",
+  "sector": "Large Value"
+ },
  "SMH": {
   "asset_type": "ETF",
   "name": "VanEck Semiconductor ETF",
@@ -299,10 +314,20 @@
   "name": "Vanguard S&P 500 ETF",
   "sector": "Large Blend"
  },
+ "VTI": {
+  "asset_type": "ETF",
+  "name": "Vanguard Morningstar Total Stoc",
+  "sector": "Large Blend"
+ },
  "VXUS": {
   "asset_type": "ETF",
   "name": "Vanguard Total International St",
   "sector": "Foreign Large Blend"
+ },
+ "XLK": {
+  "asset_type": "ETF",
+  "name": "State Street Technology Select ",
+  "sector": "Technology"
  },
  "ZETA": {
   "asset_type": "STOCK",
