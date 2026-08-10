@@ -38,3 +38,8 @@ logs/
 # Excluded by default because this repo is intended to be shown publicly.
 # Remove these two lines if you decide the numbers are fine to publish.
 projects/05-portfolio-database/results/
+
+# Editor/agent local config. Excluded because launch.json here points at an
+# absolute path in a different project (~/Desktop/tailguard) and is specific to
+# one machine — it would be noise plus a local filesystem path in a public repo.
+.claude/
