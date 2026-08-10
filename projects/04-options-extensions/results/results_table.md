@@ -25,6 +25,6 @@ Correctness: Black-Scholes 23.3761 inside antithetic 95% CI [23.3249, 23.4375] -
 
 ### Bayesian P(up tomorrow)
 
-- Source: live GOOGL data, 500 days
-- Final posterior mean: **0.5259** (95% CI [0.4822, 0.5694])
-- Credible interval narrowed from 0.532 (day 10) to 0.087
+- Source: live GOOGL data, 499 days
+- Final posterior mean: **0.5309** (95% CI [0.4872, 0.5745])
+- Credible interval narrowed from 0.500 (day 10) to 0.087

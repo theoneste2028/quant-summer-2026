@@ -39,7 +39,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.487573+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119899+00:00"
  },
  {
   "_id": "24033547-0ecd-3811-bb34-20a33f79ca96",
@@ -81,7 +81,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.487609+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119918+00:00"
  },
  {
   "_id": "792afe34-c8a0-32bc-b78e-5b6b51dfcaed",
@@ -123,7 +123,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.487619+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119922+00:00"
  },
  {
   "_id": "4d3618f0-f015-3f88-9229-934d5456e045",
@@ -165,7 +165,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.487626+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119925+00:00"
  },
  {
   "_id": "cea41ab3-33da-30ba-a78c-88b094c6ffed",
@@ -207,7 +207,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.487632+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119927+00:00"
  },
  {
   "_id": "53f7a229-2bd9-37b2-9123-07e7dde42c8f",
@@ -230,7 +230,7 @@
    "lang": "en-US"
   },
   "thumbnail": {},
-  "fetched_at": "2026-08-10T15:36:34.487638+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119929+00:00"
  },
  {
   "_id": "e2973c5e-8289-395d-b46c-4531efa2f794",
@@ -272,7 +272,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.487643+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119932+00:00"
  },
  {
   "_id": "f777c1e9-fadc-35e9-b319-29247399f0da",
@@ -314,7 +314,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.487649+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119934+00:00"
  },
  {
   "_id": "92f86710-d115-3e4f-a4f9-89e109f44b0c",
@@ -356,7 +356,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.487654+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119936+00:00"
  },
  {
   "_id": "dc8d8af4-f6c4-375e-8677-10c10edd9a88",
@@ -398,7 +398,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.487659+00:00"
+  "fetched_at": "2026-08-10T16:11:26.119938+00:00"
  },
  {
   "_id": "f0dcceda-a700-48cd-b631-01ffbf3242e0",
@@ -440,7 +440,49 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.615432+00:00"
+  "fetched_at": "2026-08-10T16:11:26.278851+00:00"
+ },
+ {
+  "_id": "4d14f823-c98a-3a88-8c42-a04662570b30",
+  "tickers": [
+   "MU"
+  ],
+  "title": "Why Micron is Decisively Better Positioned Than Intel Now",
+  "summary": "Both Micron and Intel just reported earnings that crushed expectations, but one company is locking in guaranteed billion-dollar AI contracts while the other is still waiting for its first external foundry customer to sign.",
+  "content_type": "STORY",
+  "pub_date": "2026-08-10T15:53:40Z",
+  "provider": {
+   "displayName": "24/7 Wall St.",
+   "url": "https://247wallst.com/",
+   "sourceId": "24_7_wall_st__718"
+  },
+  "canonical_url": {
+   "url": "https://247wallst.com/investing/2026/08/10/why-micron-is-decisively-better-positioned-than-intel-now/",
+   "site": "finance",
+   "region": "US",
+   "lang": "en-US"
+  },
+  "thumbnail": {
+   "originalUrl": "https://media.zenfs.com/en/24_7_wall_st__718/177ccb95ae6b0fd1da9ef5c418fb9688",
+   "originalWidth": 2844,
+   "originalHeight": 1600,
+   "caption": "",
+   "resolutions": [
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/FU.9P6vf5ulgLKwIF0EXgQ--~B/aD0xNjAwO3c9Mjg0NDthcHBpZD15dGFjaHlvbg--/https://media.zenfs.com/en/24_7_wall_st__718/177ccb95ae6b0fd1da9ef5c418fb9688",
+     "width": 2844,
+     "height": 1600,
+     "tag": "original"
+    },
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/36NBz_6XhWm0BmT.fKqIQQ--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/24_7_wall_st__718/177ccb95ae6b0fd1da9ef5c418fb9688",
+     "width": 170,
+     "height": 128,
+     "tag": "170x128"
+    }
+   ]
+  },
+  "fetched_at": "2026-08-10T16:11:26.278880+00:00"
  },
  {
   "_id": "213c622b-0def-3618-ad40-1ad34261d975",
@@ -463,7 +505,50 @@
    "lang": "en-US"
   },
   "thumbnail": {},
-  "fetched_at": "2026-08-10T15:36:34.615456+00:00"
+  "fetched_at": "2026-08-10T16:11:26.278884+00:00"
+ },
+ {
+  "_id": "3a757630-e81e-30be-8a2d-9b1bdf4ca1fa",
+  "tickers": [
+   "MU",
+   "GOOGL"
+  ],
+  "title": "Microsoft, Amazon, Micron and Alphabet are part of Zacks Earnings Preview",
+  "summary": "Microsoft, Amazon, Micron and Alphabet headline a strong Q2 season, with robust earnings and upward revisions reinforcing corporate fundamentals.",
+  "content_type": "STORY",
+  "pub_date": "2026-08-10T15:06:00Z",
+  "provider": {
+   "displayName": "Zacks",
+   "url": "http://www.zacks.com/",
+   "sourceId": "zacks.com"
+  },
+  "canonical_url": {
+   "url": "https://finance.yahoo.com/markets/stocks/articles/microsoft-amazon-micron-alphabet-part-150600706.html",
+   "site": "finance",
+   "region": "US",
+   "lang": "en-US"
+  },
+  "thumbnail": {
+   "originalUrl": "https://media.zenfs.com/en/zacks.com/f7ee9fd1261c79c18c594e1dc7300155",
+   "originalWidth": 635,
+   "originalHeight": 400,
+   "caption": "",
+   "resolutions": [
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/NCx.D1VeFrusUjk62NhUIg--~B/aD00MDA7dz02MzU7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/zacks.com/f7ee9fd1261c79c18c594e1dc7300155",
+     "width": 635,
+     "height": 400,
+     "tag": "original"
+    },
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/6G2T3fpdC.z_uYDO0xv1UA--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/zacks.com/f7ee9fd1261c79c18c594e1dc7300155",
+     "width": 170,
+     "height": 128,
+     "tag": "170x128"
+    }
+   ]
+  },
+  "fetched_at": "2026-08-10T16:11:26.278888+00:00"
  },
  {
   "_id": "cfb25418-fb89-3ef9-98d7-fede9996999d",
@@ -505,7 +590,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.615462+00:00"
+  "fetched_at": "2026-08-10T16:11:26.278892+00:00"
  },
  {
   "_id": "9758a750-1697-3fe4-82f7-3b0fcd647340",
@@ -547,7 +632,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.615466+00:00"
+  "fetched_at": "2026-08-10T16:11:26.278895+00:00"
  },
  {
   "_id": "14ff16a9-1887-316e-aed1-5f3c0161aae3",
@@ -589,7 +674,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.615470+00:00"
+  "fetched_at": "2026-08-10T16:11:26.278899+00:00"
  },
  {
   "_id": "45233ccf-1c5c-3719-be9f-559b2f1c20f1",
@@ -631,7 +716,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.615474+00:00"
+  "fetched_at": "2026-08-10T16:11:26.278902+00:00"
  },
  {
   "_id": "84ee16bf-7670-3647-9e2c-4cc1acc856db",
@@ -673,7 +758,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.615479+00:00"
+  "fetched_at": "2026-08-10T16:11:26.278906+00:00"
  },
  {
   "_id": "8c85c91a-38a6-3590-85ef-5e5e6491bb02",
@@ -715,175 +800,217 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.615483+00:00"
+  "fetched_at": "2026-08-10T16:11:26.278910+00:00"
  },
  {
-  "_id": "91f07faf-5b41-3711-95e3-7457aaae26dd",
+  "_id": "99abe444-4ab9-4edb-b77c-257460599ae1",
   "tickers": [
-   "MU"
+   "GOOGL"
   ],
-  "title": "Chip Stocks Face a Long Climb Back to Their Peak Despite Recent Rally",
-  "summary": "The PHLX Semiconductor Index has roared back to life, climbing more than 18% from its recent low on July 29. Yet it still has a long way to go to reclaim its summertime highs. Following last month's sharp decline, the index\u2014consisting of names like Nvidia, Micron Technology, and Broadcom\u2014needs an additional 18.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-10T10:22:31Z",
+  "title": "Berkshire is buying stocks under Greg Abel, but who\u2019s really in charge?",
+  "summary": "Yahoo Finance Markets and Data Editor Jared Blikre and Breaking News Reporter Jake Conley break down Berkshire Hathaway (BRK-A, BRK-B)\u2019s new approach under CEO Greg Abel. The company bought more stocks than it sold for the first time in three years, signaling a potential shift in its investment strategy.",
+  "content_type": "VIDEO",
+  "pub_date": "2026-08-10T15:53:00Z",
   "provider": {
-   "displayName": "The Wall Street Journal",
-   "url": "http://www.wsj.com/",
-   "sourceId": "wsj.com"
+   "displayName": "Yahoo Finance Video",
+   "url": "https://finance.yahoo.com/",
+   "sourceId": "video.yahoofinance.com"
   },
   "canonical_url": {
-   "url": "https://www.wsj.com/livecoverage/stock-market-today-dow-sp-500-nasdaq-08-10-2026/card/chip-stocks-face-a-long-climb-back-to-their-peak-despite-recent-rally-VMPs0LjGUDijwjmC7pbF?siteid=yhoof2&yptr=yahoo",
+   "url": "https://finance.yahoo.com/video/berkshire-buying-stocks-under-greg-155300705.html",
    "site": "finance",
    "region": "US",
    "lang": "en-US"
   },
   "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/wsj.com/7b2c285183be07ca3c4e8242b25a59a8",
-   "originalWidth": 1200,
-   "originalHeight": 630,
+   "originalUrl": "https://s.yimg.com/uu/api/res/1.2/8TeDpGmbULr1moqmz3AaQg--~B/aD0zNTgzO3c9NTI3NTthcHBpZD15dGFjaHlvbg--/https://d29szjachogqwa.cloudfront.net/images/2026-08/0f7a01dc-3ed6-463c-914d-78de27475fca",
+   "originalWidth": 5275,
+   "originalHeight": 3583,
    "caption": "",
    "resolutions": [
     {
-     "url": "https://s.yimg.com/uu/api/res/1.2/Fwf5HL4GsEGPbDfR3MJBPg--~B/aD02MzA7dz0xMjAwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/wsj.com/7b2c285183be07ca3c4e8242b25a59a8",
-     "width": 1200,
-     "height": 630,
+     "url": "https://s.yimg.com/uu/api/res/1.2/8TeDpGmbULr1moqmz3AaQg--~B/aD0zNTgzO3c9NTI3NTthcHBpZD15dGFjaHlvbg--/https://d29szjachogqwa.cloudfront.net/images/2026-08/0f7a01dc-3ed6-463c-914d-78de27475fca",
+     "width": 5275,
+     "height": 3583,
      "tag": "original"
     },
     {
-     "url": "https://s.yimg.com/uu/api/res/1.2/c34MZxHLZOfDYN2BBjM9ww--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/wsj.com/7b2c285183be07ca3c4e8242b25a59a8",
+     "url": "https://s.yimg.com/uu/api/res/1.2/d0zOph0Y9sfcXJMyWevpKg--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://d29szjachogqwa.cloudfront.net/images/2026-08/0f7a01dc-3ed6-463c-914d-78de27475fca",
      "width": 170,
      "height": 128,
      "tag": "170x128"
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.615489+00:00"
+  "fetched_at": "2026-08-10T16:11:26.425007+00:00"
  },
  {
-  "_id": "2ac19a93-1eb1-3056-a6bd-2d48b60d1201",
+  "_id": "60001949-965b-3a23-b464-549fac28250d",
   "tickers": [
-   "MU"
+   "GOOGL"
   ],
-  "title": "Micron\u2019s Memory Boom Is Heading For A Peak, Analyst Warns",
-  "summary": "Micron Technology, Inc. (NASDAQ:MU) stock gained about 1% in Monday premarket trading as technology stocks moved higher ahead of the opening bell. Nasdaq futures rose 0.41%, while S&P 500 futures gained 0.17%.The move comes as investors weigh Micron\u2019s longer-term growth prospects against expectations for slowing memory pricing momentum and rising competition from Chinese manufacturers.On Aug. 7, Citigroup analyst Atif Malik maintained a Buy rating on Micron but lowered his price forecast to $1,1",
+  "title": "Google Stock Sputters, But These Catalysts Could Spark A Rebound",
+  "summary": "Google stock is in need of a jump-start after the recent DeepMind shake-up. Robust 2026 estimates may reignite the AI giant's shares.",
   "content_type": "STORY",
-  "pub_date": "2026-08-10T10:00:28Z",
+  "pub_date": "2026-08-10T15:59:34Z",
   "provider": {
-   "displayName": "Benzinga",
-   "url": "http://www.benzinga.com/",
-   "sourceId": "Benzinga"
+   "displayName": "Investor's Business Daily",
+   "url": "http://www.investors.com/",
+   "sourceId": "ibd.com"
   },
   "canonical_url": {
-   "url": "https://finance.yahoo.com/markets/stocks/articles/micron-memory-boom-heading-peak-100028273.html",
+   "url": "https://www.investors.com/research/how-to-find-the-best-stocks-to-buy/google-stock-googl-deepmind-news-alphabet-outlook-strong-tech-markets/?src=A00220&yptr=yahoo",
    "site": "finance",
    "region": "US",
    "lang": "en-US"
   },
   "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/Benzinga/e7c90cc75e76fb061980f709ca865eb0",
+   "originalUrl": "https://media.zenfs.com/en/ibd.com/bb4e0b98558e023875bf61b02cd206d4",
    "originalWidth": 1000,
-   "originalHeight": 666,
+   "originalHeight": 563,
    "caption": "",
    "resolutions": [
     {
-     "url": "https://s.yimg.com/uu/api/res/1.2/vmoV6us1uppsP7Lu6_kzyQ--~B/aD02NjY7dz0xMDAwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/Benzinga/e7c90cc75e76fb061980f709ca865eb0",
+     "url": "https://s.yimg.com/uu/api/res/1.2/B2mRQkt85.C_NZ4MI_o0.Q--~B/aD01NjM7dz0xMDAwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/ibd.com/bb4e0b98558e023875bf61b02cd206d4",
      "width": 1000,
-     "height": 666,
+     "height": 563,
      "tag": "original"
     },
     {
-     "url": "https://s.yimg.com/uu/api/res/1.2/aUHtkuz_xhfp5VAmv6GFJg--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/Benzinga/e7c90cc75e76fb061980f709ca865eb0",
+     "url": "https://s.yimg.com/uu/api/res/1.2/MMjsZ0ty9IfvoibtGKVdPg--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/ibd.com/bb4e0b98558e023875bf61b02cd206d4",
      "width": 170,
      "height": 128,
      "tag": "170x128"
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.615493+00:00"
+  "fetched_at": "2026-08-10T16:11:26.425026+00:00"
  },
  {
-  "_id": "9416db03-a56c-46eb-9ca4-2597811d2a87",
+  "_id": "a4779d58-295d-37d5-b428-e42e364a2b56",
   "tickers": [
    "GOOGL"
   ],
-  "title": "Why Google and Amazon rank top among Cloud hyperscalers for AI",
-  "summary": "Sevens Report Research founder Tom Essaye explains why cloud capacity is the next critical bottleneck in AI infrastructure and ranks Google (GOOG), Amazon (AMZN), and Microsoft (MSFT) based on their cloud revenue opportunities.",
-  "content_type": "VIDEO",
-  "pub_date": "2026-08-10T14:32:56Z",
+  "title": "Will Apple Have To Increase iPhone Prices?",
+  "summary": "Soaring memory costs have already pushed up MacBook and iPad prices, but those products are small fish compared to the iPhone. Now Apple faces a collision of forces that could force its hand on the product that generates 90% of the smartphone industry's profits.",
+  "content_type": "STORY",
+  "pub_date": "2026-08-10T15:59:05Z",
   "provider": {
-   "displayName": "Yahoo Finance Video",
-   "url": "https://finance.yahoo.com/",
-   "sourceId": "video.yahoofinance.com"
+   "displayName": "24/7 Wall St.",
+   "url": "https://247wallst.com/",
+   "sourceId": "24_7_wall_st__718"
   },
   "canonical_url": {
-   "url": "https://finance.yahoo.com/video/why-google-amazon-rank-top-143256903.html",
+   "url": "https://247wallst.com/investing/2026/08/10/will-apple-have-to-increase-iphone-prices/",
    "site": "finance",
    "region": "US",
    "lang": "en-US"
   },
   "thumbnail": {
-   "originalUrl": "https://s.yimg.com/uu/api/res/1.2/OMC_H6pcNAqczHWU.kDNWg--~B/aD0zNzU0O3c9NTAwMDthcHBpZD15dGFjaHlvbg--/https://d29szjachogqwa.cloudfront.net/images/2026-08/7cc3ef07-60db-41f7-8f7a-a11493d51975",
-   "originalWidth": 5000,
-   "originalHeight": 3754,
+   "originalUrl": "https://media.zenfs.com/en/24_7_wall_st__718/b42d4cc5ce0f63460a3c185ba842c5bd",
+   "originalWidth": 2560,
+   "originalHeight": 1921,
    "caption": "",
    "resolutions": [
     {
-     "url": "https://s.yimg.com/uu/api/res/1.2/OMC_H6pcNAqczHWU.kDNWg--~B/aD0zNzU0O3c9NTAwMDthcHBpZD15dGFjaHlvbg--/https://d29szjachogqwa.cloudfront.net/images/2026-08/7cc3ef07-60db-41f7-8f7a-a11493d51975",
-     "width": 5000,
-     "height": 3754,
+     "url": "https://s.yimg.com/uu/api/res/1.2/frrqLUDzH3Bz.lfda7rfMw--~B/aD0xOTIxO3c9MjU2MDthcHBpZD15dGFjaHlvbg--/https://media.zenfs.com/en/24_7_wall_st__718/b42d4cc5ce0f63460a3c185ba842c5bd",
+     "width": 2560,
+     "height": 1921,
      "tag": "original"
     },
     {
-     "url": "https://s.yimg.com/uu/api/res/1.2/1763IF63QyYE8TM5qQXRqA--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://d29szjachogqwa.cloudfront.net/images/2026-08/7cc3ef07-60db-41f7-8f7a-a11493d51975",
+     "url": "https://s.yimg.com/uu/api/res/1.2/GHR_T0tw_zXgPxFvv8e78g--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/24_7_wall_st__718/b42d4cc5ce0f63460a3c185ba842c5bd",
      "width": 170,
      "height": 128,
      "tag": "170x128"
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.723320+00:00"
+  "fetched_at": "2026-08-10T16:11:26.425029+00:00"
  },
  {
-  "_id": "5482702d-ea01-40cc-ba51-3017dc064d95",
+  "_id": "64ac3d3f-db79-3e19-9cb2-21e9a30db9f5",
   "tickers": [
    "GOOGL"
   ],
-  "title": "JPMorgan\u2019s S&P 500 8,000 target: Is the market getting too expensive?",
-  "summary": "Yahoo Finance Executive Editor Brian Sozzi and his Opening Bid panel break down JPMorgan's (JPM) outlook for the S&P 500 (^GSPC), including its 8,000 year-end target and what an elevated CAPE ratio could mean for stocks and the broader market.",
-  "content_type": "VIDEO",
-  "pub_date": "2026-08-10T14:16:00Z",
+  "title": "Analyst Warns Alphabet (GOOG) Faces Two Major AI Problems; SpaceX (SPCX) a Better AI Bet?",
+  "summary": "Alphabet (GOOG, GOOGL) shares made headlines recently after the company\u2019s AI division saw a series of high-profile departures. Gene Munster, managing partner at Deepwater Asset Management, recently said on CNBC that the brain drain at Google should not be ignored, arguing that the departures of key AI researchers could have implications beyond the headlines. Munster [\u2026]",
+  "content_type": "STORY",
+  "pub_date": "2026-08-10T15:45:04Z",
   "provider": {
-   "displayName": "Yahoo Finance Video",
-   "url": "https://finance.yahoo.com/",
-   "sourceId": "video.yahoofinance.com"
+   "displayName": "Insider Monkey",
+   "url": "http://www.insidermonkey.com",
+   "sourceId": "insidermonkey.com"
   },
   "canonical_url": {
-   "url": "https://finance.yahoo.com/video/jpmorgan-p-500-8-000-141600149.html",
+   "url": "https://finance.yahoo.com/technology/ai/articles/analyst-warns-alphabet-goog-faces-154504509.html",
    "site": "finance",
    "region": "US",
    "lang": "en-US"
   },
   "thumbnail": {
-   "originalUrl": "https://s.yimg.com/uu/api/res/1.2/eRZ12zbqQt1UPVp8uUOU_g--~B/aD00MDAwO3c9NjAwMDthcHBpZD15dGFjaHlvbg--/https://d29szjachogqwa.cloudfront.net/images/2026-08/58cd9604-4e08-4e88-aafe-4c58f6f294fa",
-   "originalWidth": 6000,
-   "originalHeight": 4000,
+   "originalUrl": "https://media.zenfs.com/en/insidermonkey.com/e34da1e44fe235c06d38d8525b97161c",
+   "originalWidth": 768,
+   "originalHeight": 433,
    "caption": "",
    "resolutions": [
     {
-     "url": "https://s.yimg.com/uu/api/res/1.2/eRZ12zbqQt1UPVp8uUOU_g--~B/aD00MDAwO3c9NjAwMDthcHBpZD15dGFjaHlvbg--/https://d29szjachogqwa.cloudfront.net/images/2026-08/58cd9604-4e08-4e88-aafe-4c58f6f294fa",
-     "width": 6000,
-     "height": 4000,
+     "url": "https://s.yimg.com/uu/api/res/1.2/yM3b4v87G0Pf0PEWHUsV4Q--~B/aD00MzM7dz03Njg7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/insidermonkey.com/e34da1e44fe235c06d38d8525b97161c",
+     "width": 768,
+     "height": 433,
      "tag": "original"
     },
     {
-     "url": "https://s.yimg.com/uu/api/res/1.2/0dlPXNMnppB_QZFYzbw1ag--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://d29szjachogqwa.cloudfront.net/images/2026-08/58cd9604-4e08-4e88-aafe-4c58f6f294fa",
+     "url": "https://s.yimg.com/uu/api/res/1.2/zbW.mblHbG9z3s4t5hxwOg--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/insidermonkey.com/e34da1e44fe235c06d38d8525b97161c",
      "width": 170,
      "height": 128,
      "tag": "170x128"
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.723343+00:00"
+  "fetched_at": "2026-08-10T16:11:26.425031+00:00"
+ },
+ {
+  "_id": "710aa6f3-ce03-3235-be4f-df1b72d2a10c",
+  "tickers": [
+   "GOOGL"
+  ],
+  "title": "CoreWeave Stock Rallied Ahead Of Its Own Numbers, Not On Them",
+  "summary": "The only fresh operating news of the week does not come online for another two years.",
+  "content_type": "STORY",
+  "pub_date": "2026-08-10T15:39:28Z",
+  "provider": {
+   "displayName": "Trefis",
+   "url": "https://www.trefis.com/",
+   "sourceId": "trefis_142"
+  },
+  "canonical_url": {
+   "url": "https://www.trefis.com/articles/610752/coreweave-stock-rallied-ahead-of-its-own-numbers-not-on-them/2026-08-10",
+   "site": "finance",
+   "region": "US",
+   "lang": "en-US"
+  },
+  "thumbnail": {
+   "originalUrl": "https://media.zenfs.com/en/trefis_142/d0fb607ba29ccb86cca51d2a0cb6e193",
+   "originalWidth": 1280,
+   "originalHeight": 853,
+   "caption": "",
+   "resolutions": [
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/IbYZJF3oxZGBO7PTD6LRuQ--~B/aD04NTM7dz0xMjgwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/trefis_142/d0fb607ba29ccb86cca51d2a0cb6e193",
+     "width": 1280,
+     "height": 853,
+     "tag": "original"
+    },
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/UCgtJy6S.KYKTfqhq8CMkQ--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/trefis_142/d0fb607ba29ccb86cca51d2a0cb6e193",
+     "width": 170,
+     "height": 128,
+     "tag": "170x128"
+    }
+   ]
+  },
+  "fetched_at": "2026-08-10T16:11:26.425034+00:00"
  },
  {
   "_id": "20ce6c19-f4ab-324d-9377-70f30d6e335d",
@@ -925,7 +1052,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.723349+00:00"
+  "fetched_at": "2026-08-10T16:11:26.425037+00:00"
  },
  {
   "_id": "5880e661-9ec7-303f-a24e-fc6bf69dfd12",
@@ -967,7 +1094,49 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.723355+00:00"
+  "fetched_at": "2026-08-10T16:11:26.425045+00:00"
+ },
+ {
+  "_id": "0beb0c59-f773-3c9c-80ab-86e6078c7a62",
+  "tickers": [
+   "GOOGL"
+  ],
+  "title": "Alphabet's Higher AI Spending Could Boost These ETFs",
+  "summary": "GOOGL boosts 2026 capex to $205B, signaling stronger AI demand. Read on to explore ETFs poised to benefit from the next wave of AI spending.",
+  "content_type": "STORY",
+  "pub_date": "2026-08-10T14:40:00Z",
+  "provider": {
+   "displayName": "Zacks",
+   "url": "http://www.zacks.com/",
+   "sourceId": "zacks.com"
+  },
+  "canonical_url": {
+   "url": "https://finance.yahoo.com/technology/ai/articles/alphabets-higher-ai-spending-could-144000850.html",
+   "site": "finance",
+   "region": "US",
+   "lang": "en-US"
+  },
+  "thumbnail": {
+   "originalUrl": "https://media.zenfs.com/en/zacks.com/76132323c88812a1d58faada145d6911",
+   "originalWidth": 635,
+   "originalHeight": 400,
+   "caption": "",
+   "resolutions": [
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/rfGmDr5rdgOAA0J0dy3kpg--~B/aD00MDA7dz02MzU7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/zacks.com/76132323c88812a1d58faada145d6911",
+     "width": 635,
+     "height": 400,
+     "tag": "original"
+    },
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/DWfOgxY.b6brdTsadcXVQA--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/zacks.com/76132323c88812a1d58faada145d6911",
+     "width": 170,
+     "height": 128,
+     "tag": "170x128"
+    }
+   ]
+  },
+  "fetched_at": "2026-08-10T16:11:26.425048+00:00"
  },
  {
   "_id": "c63af5d8-3d20-3333-bccc-15e5a59e9a2f",
@@ -1009,599 +1178,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.723361+00:00"
- },
- {
-  "_id": "08e873ee-a0a0-34a1-af4b-9633148f01a2",
-  "tickers": [
-   "GOOGL"
-  ],
-  "title": "Meta shares gain as Muse Glimmer launch highlights broader AI ambitions",
-  "summary": "Meta (NASDAQ:META) shares rose 2. 4% on Monday following the launch of Muse Glimmer, a compact artificial intelligence model with 30 billion parameters that is designed to operate on a single GPU.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-10T14:07:37Z",
-  "provider": {
-   "displayName": "InvestorsHub",
-   "url": "https://investorshub.advfn.com/",
-   "sourceId": "investorshub_458"
-  },
-  "canonical_url": {
-   "url": "https://investorshub.advfn.com/market-news/article/33868/meta-shares-gain-as-muse-glimmer-launch-highlights-broader-ai-ambitions",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/investorshub_458/92dffc6f0c8e0445c8276bd687212871",
-   "originalWidth": 1200,
-   "originalHeight": 659,
-   "caption": "Robot hand touching human hand \u00a9Adobe Stock Images",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/UBdCzgHXqfzFpIuN8x_RDQ--~B/aD02NTk7dz0xMjAwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/investorshub_458/92dffc6f0c8e0445c8276bd687212871",
-     "width": 1200,
-     "height": 659,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/n2.FWVC_VTca_jDpi0bsKw--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/investorshub_458/92dffc6f0c8e0445c8276bd687212871",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.723366+00:00"
- },
- {
-  "_id": "07231a19-d990-3bdf-97ac-46be445719e1",
-  "tickers": [
-   "GOOGL"
-  ],
-  "title": "Nvidia Scores 12% Weekly Gain As Taiwan Semiconductor Sales Soars; Is Nvidia A Buy Now?",
-  "summary": "Nvidia takes a breather after jumping 12% last week. The stock is in a cup base with a buy point of 236.54.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-10T14:00:36Z",
-  "provider": {
-   "displayName": "Investor's Business Daily",
-   "url": "http://www.investors.com/",
-   "sourceId": "ibd.com"
-  },
-  "canonical_url": {
-   "url": "https://www.investors.com/research/nvidia-nvda-stock-earnings-august-2026/?src=A00220&yptr=yahoo",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/ibd.com/486c3f6653880f282111177cb1f46ca8",
-   "originalWidth": 1000,
-   "originalHeight": 511,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/nC0ft3re3xuSlqDtOuz5Ug--~B/aD01MTE7dz0xMDAwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/ibd.com/486c3f6653880f282111177cb1f46ca8",
-     "width": 1000,
-     "height": 511,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/R15qsaHibI11CDsGQEYFiQ--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/ibd.com/486c3f6653880f282111177cb1f46ca8",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.723372+00:00"
- },
- {
-  "_id": "db3378b4-5cec-331b-9646-e9bf019e5f4a",
-  "tickers": [
-   "GOOGL"
-  ],
-  "title": "Microsoft Plans Production Boost for AI Chips, Report Says",
-  "summary": "(Bloomberg) -- Microsoft Corp. is planning to \u201csignificantly\u201d increase production of its next-generation AI chips, the Information reported.Most Read from BloombergChina Unleashes $28 Trillion Capital Markets to Challenge US in AIIran Shakes Up Security Team After Saying Oman Deal \u2018Very Close\u2019Stocks Churn as Oil Advance Boosts Treasury Yields: Markets WrapTrump Amps Up Pressure on Billionaire Sargeant to Exit VenezuelaBehind Bessent Moves, Wall Street Sees a Bond-Market AngstThe company has been",
-  "content_type": "STORY",
-  "pub_date": "2026-08-10T13:55:51Z",
-  "provider": {
-   "displayName": "Bloomberg",
-   "url": "https://www.bloomberg.com/company",
-   "sourceId": "bloomberg_holding_pen_162"
-  },
-  "canonical_url": {
-   "url": "https://finance.yahoo.com/technology/ai/articles/microsoft-plans-production-boost-ai-135551218.html",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {},
-  "fetched_at": "2026-08-10T15:36:34.723377+00:00"
- },
- {
-  "_id": "d394bdca-f3c8-32c3-8008-c03d281db745",
-  "tickers": [
-   "GOOGL"
-  ],
-  "title": "Anthropic partners with Macquarie and GIC to build data centers",
-  "summary": "Investing.com -- Anthropic PBC announced Monday a partnership with Macquarie Asset Management and Singapore's GIC to develop data centers for its Claude artificial intelligence platform.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-10T13:11:24Z",
-  "provider": {
-   "displayName": "Investing.com",
-   "url": "https://www.investing.com/",
-   "sourceId": "investing_com_631"
-  },
-  "canonical_url": {
-   "url": "https://finance.yahoo.com/technology/ai/articles/anthropic-partners-macquarie-gic-build-131124573.html",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {},
-  "fetched_at": "2026-08-10T15:36:34.723383+00:00"
- },
- {
-  "_id": "058dd821-1f72-3306-8a42-285098503b58",
-  "tickers": [
-   "GOOGL"
-  ],
-  "title": "TSMC Revenue Surges as AI Chip Demand Hold",
-  "summary": "Revenue up 44.7%, high-performance computing at 66% of sales, and capex guidance lifted to as much as $64 billion",
-  "content_type": "STORY",
-  "pub_date": "2026-08-10T13:04:45Z",
-  "provider": {
-   "displayName": "Moby",
-   "url": "https://moby.co/",
-   "sourceId": "moby_896"
-  },
-  "canonical_url": {
-   "url": "https://app.moby.co/home/news/news-tsmc-revenue-surges-as-ai-chip-demand-hold?utm_source=yahoo_finance&utm_medium=rss",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/moby_896/6869a04fc4bcd7570c80c9c222e936de",
-   "originalWidth": 928,
-   "originalHeight": 1152,
-   "caption": "TSMC Revenue Surges as AI Chip Demand Hold",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/hivzApBgePCrizBEqg5Wkw--~B/aD0xMTUyO3c9OTI4O2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/moby_896/6869a04fc4bcd7570c80c9c222e936de",
-     "width": 928,
-     "height": 1152,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/EXUY18wMIkQvegy6ZIdwEg--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/moby_896/6869a04fc4bcd7570c80c9c222e936de",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.723389+00:00"
- },
- {
-  "_id": "3883ac6c-24eb-3d2a-9810-f3b41c853ddd",
-  "tickers": [
-   "PL"
-  ],
-  "title": "Is Planet Labs PBC (PL) Stock Too Stretched To Be Reasonable?",
-  "summary": "Planet Labs PBC has delivered very strong returns over the past three years, yet the broader valuation checks suggest the stock now leans expensive rather than like an obvious bargain. Planet Labs PBC has returned roughly 5.6x over the past three years, which puts extra focus on whether the current price still leaves room for an attractive long term outcome. The recent Scottish Government agreement that uses Planet Labs PBC's AI enabled satellite data can support expectations for ongoing...",
-  "content_type": "STORY",
-  "pub_date": "2026-08-07T14:16:17Z",
-  "provider": {
-   "displayName": "Simply Wall St.",
-   "url": "https://simplywall.st/",
-   "sourceId": "simply_wall_st__316"
-  },
-  "canonical_url": {
-   "url": "https://finance.yahoo.com/markets/stocks/articles/planet-labs-pbc-pl-stock-141617365.html",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/simply_wall_st__316/58df37cadd48c6619bbe022c72dae85c",
-   "originalWidth": 1194,
-   "originalHeight": 432,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/94bcc5bcuvrJNKUdDP7UgA--~B/aD00MzI7dz0xMTk0O2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/simply_wall_st__316/58df37cadd48c6619bbe022c72dae85c",
-     "width": 1194,
-     "height": 432,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/YHDvHLk.wjQKqYJfhvuHng--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/simply_wall_st__316/58df37cadd48c6619bbe022c72dae85c",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835790+00:00"
- },
- {
-  "_id": "d76bd5c0-58c4-3daf-b83b-7c9fb2cdd522",
-  "tickers": [
-   "PL"
-  ],
-  "title": "Why Conestoga Capital Advisors Decided to Sell PL Planet Labs (PL)",
-  "summary": "Conestoga Capital Advisors, an asset management company, released its second-quarter 2026 investor letter. A copy of the letter can be downloaded here. The letter reports a positive market shift towards Small Caps, with the Russell 2000 Index achieving its best first half since 1991 and the Russell 2000 Growth Index up 25.7% in Q2, fueled by AI [\u2026]",
-  "content_type": "STORY",
-  "pub_date": "2026-08-07T13:20:47Z",
-  "provider": {
-   "displayName": "Insider Monkey",
-   "url": "http://www.insidermonkey.com",
-   "sourceId": "insidermonkey.com"
-  },
-  "canonical_url": {
-   "url": "https://finance.yahoo.com/markets/stocks/articles/why-conestoga-capital-advisors-decided-132047818.html",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/insidermonkey.com/90235e93d9fea5aef4c82e13a77b85bd",
-   "originalWidth": 768,
-   "originalHeight": 430,
-   "caption": "Voyager Technologies (VOYG) Wins ISS Mission Management Role for Icarus Robotics Demo",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/9eY_1p0rJ1kq5Pt4W4KekA--~B/aD00MzA7dz03Njg7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/insidermonkey.com/90235e93d9fea5aef4c82e13a77b85bd",
-     "width": 768,
-     "height": 430,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/gKs3eZqTClVAS5af06pw7g--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/insidermonkey.com/90235e93d9fea5aef4c82e13a77b85bd",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835820+00:00"
- },
- {
-  "_id": "a6e5c73d-0aad-3391-98f3-9539c80f2f64",
-  "tickers": [
-   "PL"
-  ],
-  "title": "Rocket Lab Stock Buys You A Different Risk, Not Less Of It",
-  "summary": "Its correlation to the index is only moderate, and the behavior that is genuinely its own runs on defense programs and a rocket that has yet to fly.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-06T18:23:33Z",
-  "provider": {
-   "displayName": "Trefis",
-   "url": "https://www.trefis.com/",
-   "sourceId": "trefis_142"
-  },
-  "canonical_url": {
-   "url": "https://www.trefis.com/articles/610404/rocket-lab-stock-buys-you-a-different-risk-not-less-of-it/2026-08-06",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/trefis_142/528c9d8ab4ff931a6761526b3225654f",
-   "originalWidth": 1920,
-   "originalHeight": 1280,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/6Xd3wUExDdo4ukzIZi9TUg--~B/aD0xMjgwO3c9MTkyMDthcHBpZD15dGFjaHlvbg--/https://media.zenfs.com/en/trefis_142/528c9d8ab4ff931a6761526b3225654f",
-     "width": 1920,
-     "height": 1280,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/EyTwAyFDx8BmmRFNsE2gBQ--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/trefis_142/528c9d8ab4ff931a6761526b3225654f",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835825+00:00"
- },
- {
-  "_id": "3694f903-07f0-31a4-b4c7-ba5857781f21",
-  "tickers": [
-   "PL"
-  ],
-  "title": "Up 58% in 12 Months, This Is Where Rocket Lab Will End The Year",
-  "summary": "Rocket Lab has handed investors a 58% gain over the past year, then turned around and erased nearly 30% of its value in a single month. Where a $2.2 billion backlog, a looming Neutron debut, and a Golden Dome defense contract take the stock by December is a very different question.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-06T12:00:04Z",
-  "provider": {
-   "displayName": "24/7 Wall St.",
-   "url": "https://247wallst.com/",
-   "sourceId": "24_7_wall_st__718"
-  },
-  "canonical_url": {
-   "url": "https://247wallst.com/investing/2026/08/06/up-58-in-12-months-this-is-where-rocket-lab-will-end-the-year/",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/24_7_wall_st__718/98fdf741a44d36b9df6f29319c46540d",
-   "originalWidth": 1500,
-   "originalHeight": 907,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/wZeMWOq1.IyRjjULBxLxkQ--~B/aD05MDc7dz0xNTAwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/24_7_wall_st__718/98fdf741a44d36b9df6f29319c46540d",
-     "width": 1500,
-     "height": 907,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/gR6RQEhmstYZxz13L_hPqw--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/24_7_wall_st__718/98fdf741a44d36b9df6f29319c46540d",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835829+00:00"
- },
- {
-  "_id": "5fb898a1-4628-3181-9cc1-fbf3f596ff05",
-  "tickers": [
-   "PL"
-  ],
-  "title": "Space Stocks Are Roaring Back In August \u2014 Here\u2019s Why ASTS, RKLB, RDW And Their Peers Are Leaving SpaceX Behind",
-  "summary": "SpaceX\u2019s lockup expiration threatens to more than double its public float.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-06T03:25:42Z",
-  "provider": {
-   "displayName": "Stocktwits",
-   "url": "Stocktwits",
-   "sourceId": "stocktwits_383"
-  },
-  "canonical_url": {
-   "url": "https://stocktwits.com/news-articles/markets/equity/space-stocks-roaring-august-why-asts-rklb-rdw-peers-spacex-behind/cZoJk2CRJep",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/stocktwits_383/dfb1bdf1e0d056fdb7c5c20811929c90",
-   "originalWidth": 1280,
-   "originalHeight": 771,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/ZHP7gIu8dBgDD5QSsJOAhQ--~B/aD03NzE7dz0xMjgwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/stocktwits_383/dfb1bdf1e0d056fdb7c5c20811929c90",
-     "width": 1280,
-     "height": 771,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/LGYqeQKo_EL5cBcR6V.buQ--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/stocktwits_383/dfb1bdf1e0d056fdb7c5c20811929c90",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835833+00:00"
- },
- {
-  "_id": "c5b70778-7cb5-31c8-8062-6db6d8938047",
-  "tickers": [
-   "PL"
-  ],
-  "title": "Telesat (TSAT) Moves 36.3% Higher: Will This Strength Last?",
-  "summary": "Telesat (TSAT) witnessed a jump in share price last session on above-average trading volume. The latest trend in earnings estimate revisions for the stock suggests that there could be more strength down the road.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-05T13:23:00Z",
-  "provider": {
-   "displayName": "Zacks",
-   "url": "http://www.zacks.com/",
-   "sourceId": "zacks.com"
-  },
-  "canonical_url": {
-   "url": "https://finance.yahoo.com/markets/stocks/articles/telesat-tsat-moves-36-3-132300415.html",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/zacks.com/571883406b262209e557a07c139ac340",
-   "originalWidth": 900,
-   "originalHeight": 900,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/LuD.alpQMZI4iTTrjNvWvw--~B/aD05MDA7dz05MDA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/zacks.com/571883406b262209e557a07c139ac340",
-     "width": 900,
-     "height": 900,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/RsHrOG3XWX.xJNRbrH533A--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/zacks.com/571883406b262209e557a07c139ac340",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835837+00:00"
- },
- {
-  "_id": "b2517b32-1033-3498-b42e-c78156b5474a",
-  "tickers": [
-   "PL"
-  ],
-  "title": "SpaceX Joins a Club It Was Missing From In New Nvidia Deal: How Will Stocks React?",
-  "summary": "SpaceX picked Nvidia to build Starmind AI1 satellite compute. NVDA and SPCX climbed hours before debut earnings.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-04T19:40:56Z",
-  "provider": {
-   "displayName": "BeInCrypto",
-   "url": "https://beincrypto.com/",
-   "sourceId": "beincrypto_us_662"
-  },
-  "canonical_url": {
-   "url": "https://beincrypto.com/nvidia-spacex-ai-satellites-stocks-react/",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/beincrypto_us_662/b537300b4a125367ddea021e71196edc",
-   "originalWidth": 1280,
-   "originalHeight": 720,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/9iBibBeQxxgN_MK8eS8uNw--~B/aD03MjA7dz0xMjgwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/beincrypto_us_662/b537300b4a125367ddea021e71196edc",
-     "width": 1280,
-     "height": 720,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/ebDHzAwnO3xwnBe_dIJ1CQ--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/beincrypto_us_662/b537300b4a125367ddea021e71196edc",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835841+00:00"
- },
- {
-  "_id": "cf71b638-6f4a-3274-9134-4c12b59edf6d",
-  "tickers": [
-   "PL"
-  ],
-  "title": "SpaceX Climbs 4%, AST SpaceMobile Rallies 9%, Rocket Lab Rises 5% as Traders Position for SpaceX\u2019s Debut Earnings Report",
-  "summary": "Space stocks are surging ahead of SpaceX's first-ever public earnings report, but with prediction markets flagging a 70% chance of a miss and a 911-million-share lockup expiry days away, traders face a tense setup that could cut either way.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-04T15:53:00Z",
-  "provider": {
-   "displayName": "24/7 Wall St.",
-   "url": "https://247wallst.com/",
-   "sourceId": "24_7_wall_st__718"
-  },
-  "canonical_url": {
-   "url": "https://247wallst.com/investing/2026/08/04/spacex-climbs-4-ast-spacemobile-rallies-9-rocket-lab-rises-5-as-traders-position-for-spacexs-debut-earnings-report/",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/24_7_wall_st__718/69e3b48502edc0a0ab25f46c07bc3ac9",
-   "originalWidth": 2560,
-   "originalHeight": 1695,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/_5WRfScLQ0BsxD9SHcXLZQ--~B/aD0xNjk1O3c9MjU2MDthcHBpZD15dGFjaHlvbg--/https://media.zenfs.com/en/24_7_wall_st__718/69e3b48502edc0a0ab25f46c07bc3ac9",
-     "width": 2560,
-     "height": 1695,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/.Y3TR1oJE2PFC4qAdAIYmA--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/24_7_wall_st__718/69e3b48502edc0a0ab25f46c07bc3ac9",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835845+00:00"
- },
- {
-  "_id": "835de6f9-35ca-3ab6-b675-c76511140d6d",
-  "tickers": [
-   "PL"
-  ],
-  "title": "Rocket Lab Stock's Deepest Falls Have Come From Rates, Not Rockets",
-  "summary": "Rocket Lab stock is well off its high again, and its shock record says the most serious damage comes from rate moves rather than from anything on the launch pad.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-04T14:14:09Z",
-  "provider": {
-   "displayName": "Trefis",
-   "url": "https://www.trefis.com/",
-   "sourceId": "trefis_142"
-  },
-  "canonical_url": {
-   "url": "https://www.trefis.com/articles/610040/rocket-lab-stocks-deepest-falls-have-come-from-rates-not-rockets/2026-08-04",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/trefis_142/528c9d8ab4ff931a6761526b3225654f",
-   "originalWidth": 1920,
-   "originalHeight": 1280,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/6Xd3wUExDdo4ukzIZi9TUg--~B/aD0xMjgwO3c9MTkyMDthcHBpZD15dGFjaHlvbg--/https://media.zenfs.com/en/trefis_142/528c9d8ab4ff931a6761526b3225654f",
-     "width": 1920,
-     "height": 1280,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/EyTwAyFDx8BmmRFNsE2gBQ--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/trefis_142/528c9d8ab4ff931a6761526b3225654f",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835850+00:00"
- },
- {
-  "_id": "c83c26c0-abf0-30e0-9c33-33b3c49d18da",
-  "tickers": [
-   "PL"
-  ],
-  "title": "One Space Stock Defied July\u2019s Rout \u2013 Here\u2019s Why It Outperformed ASTS, RKLB, And SPCX",
-  "summary": "Globalstar rose nearly 3% in July, outperforming a space sector in which several peers lost more than one-third of their value.",
-  "content_type": "STORY",
-  "pub_date": "2026-08-03T08:52:54Z",
-  "provider": {
-   "displayName": "Stocktwits",
-   "url": "Stocktwits",
-   "sourceId": "stocktwits_383"
-  },
-  "canonical_url": {
-   "url": "https://stocktwits.com/news-articles/markets/equity/one-space-stock-defied-july-rout-outperformed-asts-rklb-spcx/cZoTEgcRJdc",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/stocktwits_383/97ffd2e04eb59c3a555e3dedddfac12f",
-   "originalWidth": 1280,
-   "originalHeight": 854,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/pLAzt_M.gE.sp2UIeYB..Q--~B/aD04NTQ7dz0xMjgwO2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/stocktwits_383/97ffd2e04eb59c3a555e3dedddfac12f",
-     "width": 1280,
-     "height": 854,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/GE3JL0FciD8ofKCTx9MkeQ--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/stocktwits_383/97ffd2e04eb59c3a555e3dedddfac12f",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:34.835853+00:00"
+  "fetched_at": "2026-08-10T16:11:26.425050+00:00"
  },
  {
   "_id": "5a31c64e-339f-3916-8b87-62eb94310719",
@@ -1643,7 +1220,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.941399+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815130+00:00"
  },
  {
   "_id": "9e4fd09e-b996-3e80-aff0-79811ca7d9a5",
@@ -1685,7 +1262,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.941444+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815149+00:00"
  },
  {
   "_id": "261a58a4-d482-3e7d-8bbd-0d242ec5381d",
@@ -1727,7 +1304,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.941449+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815153+00:00"
  },
  {
   "_id": "019ed1c5-7921-3174-86af-7e72dc4bc135",
@@ -1769,7 +1346,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.941453+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815155+00:00"
  },
  {
   "_id": "86fb3f5c-6ca1-3a0e-a88c-e98d45d301b3",
@@ -1811,7 +1388,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.941456+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815157+00:00"
  },
  {
   "_id": "09a4acb9-4155-344b-ae5f-14feabf7fd4a",
@@ -1834,7 +1411,7 @@
    "lang": "en-US"
   },
   "thumbnail": {},
-  "fetched_at": "2026-08-10T15:36:34.941460+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815160+00:00"
  },
  {
   "_id": "b117a244-6f12-34e8-a22d-1db33cd42159",
@@ -1876,7 +1453,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.941464+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815162+00:00"
  },
  {
   "_id": "dcd033f7-0075-336e-9779-ac6499872ada",
@@ -1918,7 +1495,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.941470+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815165+00:00"
  },
  {
   "_id": "49b05862-89ce-35cc-b65e-e60705fdbac6",
@@ -1960,7 +1537,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.941474+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815167+00:00"
  },
  {
   "_id": "fb668be7-adff-348b-8d66-948d4022c350",
@@ -2002,7 +1579,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:34.941477+00:00"
+  "fetched_at": "2026-08-10T16:11:26.815168+00:00"
  },
  {
   "_id": "2e6d37ec-8743-3fd1-8b6d-79b8d4d32f95",
@@ -2044,7 +1621,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.175990+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046605+00:00"
  },
  {
   "_id": "5e7989bf-e23e-36fb-a7fc-b5b5f0b716d4",
@@ -2086,7 +1663,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.176030+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046625+00:00"
  },
  {
   "_id": "943fdcd2-34e5-36f4-b4c6-f4ecec4a0980",
@@ -2128,7 +1705,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.176036+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046636+00:00"
  },
  {
   "_id": "47c21f70-66c0-3248-9acc-d27e3c1aff98",
@@ -2151,7 +1728,7 @@
    "lang": "en-US"
   },
   "thumbnail": {},
-  "fetched_at": "2026-08-10T15:36:35.176042+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046638+00:00"
  },
  {
   "_id": "23b80151-802e-3f36-802e-92a49a57d219",
@@ -2193,7 +1770,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.176048+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046641+00:00"
  },
  {
   "_id": "6bf0da8a-faae-33c1-af5a-bcc389ef390c",
@@ -2235,7 +1812,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.176052+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046643+00:00"
  },
  {
   "_id": "77135615-328d-3070-b9bb-760d61df4d52",
@@ -2277,7 +1854,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.176057+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046646+00:00"
  },
  {
   "_id": "443004b7-efb1-3ea7-a3e9-c5d5355a2a45",
@@ -2319,7 +1896,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.176062+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046648+00:00"
  },
  {
   "_id": "179e7049-ae8e-39da-82d6-37d945692ba9",
@@ -2361,7 +1938,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.176067+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046651+00:00"
  },
  {
   "_id": "6c07c6fe-aff1-3b68-80ba-9f453ee7ff7e",
@@ -2403,7 +1980,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.176072+00:00"
+  "fetched_at": "2026-08-10T16:11:27.046653+00:00"
  },
  {
   "_id": "1db852ce-cf6c-361d-a5fd-e461ee6c5bc0",
@@ -2445,7 +2022,49 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.281617+00:00"
+  "fetched_at": "2026-08-10T16:11:27.229207+00:00"
+ },
+ {
+  "_id": "a41c527b-71fc-3bd0-8218-ba4ee72ce5ff",
+  "tickers": [
+   "TQQQ"
+  ],
+  "title": "Eyeing Short-Term Opportunities? ETFs Worth a Look",
+  "summary": "Uncertainty is creating opportunities for tactical investors. Explore ETFs positioned to capitalize on short-term moves across tech, energy and volatility.",
+  "content_type": "STORY",
+  "pub_date": "2026-08-10T14:57:00Z",
+  "provider": {
+   "displayName": "Zacks",
+   "url": "http://www.zacks.com/",
+   "sourceId": "zacks.com"
+  },
+  "canonical_url": {
+   "url": "https://finance.yahoo.com/markets/options/articles/eyeing-short-term-opportunities-etfs-145700871.html",
+   "site": "finance",
+   "region": "US",
+   "lang": "en-US"
+  },
+  "thumbnail": {
+   "originalUrl": "https://media.zenfs.com/en/zacks.com/513532652b1a8c7cf2101981c01b67f7",
+   "originalWidth": 635,
+   "originalHeight": 400,
+   "caption": "",
+   "resolutions": [
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/FeuTWZRQmhZCwZzVQRYJmg--~B/aD00MDA7dz02MzU7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/zacks.com/513532652b1a8c7cf2101981c01b67f7",
+     "width": 635,
+     "height": 400,
+     "tag": "original"
+    },
+    {
+     "url": "https://s.yimg.com/uu/api/res/1.2/lMRXsuqWQzqiMKzSRZMw_g--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/zacks.com/513532652b1a8c7cf2101981c01b67f7",
+     "width": 170,
+     "height": 128,
+     "tag": "170x128"
+    }
+   ]
+  },
+  "fetched_at": "2026-08-10T16:11:27.338557+00:00"
  },
  {
   "_id": "95cbe037-b73a-3c05-8fa3-06cd0e988ac9",
@@ -2487,7 +2106,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.460375+00:00"
+  "fetched_at": "2026-08-10T16:11:27.338577+00:00"
  },
  {
   "_id": "f446a1a8-268a-30b8-81a0-2f19c58ce3f0",
@@ -2529,7 +2148,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.460421+00:00"
+  "fetched_at": "2026-08-10T16:11:27.338580+00:00"
  },
  {
   "_id": "98574bbc-55ea-36b7-ba26-bc9932e6f0f0",
@@ -2571,7 +2190,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.460430+00:00"
+  "fetched_at": "2026-08-10T16:11:27.338583+00:00"
  },
  {
   "_id": "da790d54-4b17-376d-9f59-1928bd2d917c",
@@ -2613,7 +2232,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.460437+00:00"
+  "fetched_at": "2026-08-10T16:11:27.338585+00:00"
  },
  {
   "_id": "bb6ef198-bfca-32d6-b9a3-6aca56f23263",
@@ -2655,7 +2274,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.460446+00:00"
+  "fetched_at": "2026-08-10T16:11:27.338587+00:00"
  },
  {
   "_id": "4e8715a5-b7b2-33ca-a430-a1a82febda65",
@@ -2697,7 +2316,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.460452+00:00"
+  "fetched_at": "2026-08-10T16:11:27.338589+00:00"
  },
  {
   "_id": "459405a2-5d3a-3792-bb06-b9a3991db48b",
@@ -2739,7 +2358,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.460458+00:00"
+  "fetched_at": "2026-08-10T16:11:27.338592+00:00"
  },
  {
   "_id": "f315a081-639c-318c-9873-ac5c0c2c1ab5",
@@ -2781,7 +2400,7 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.460463+00:00"
+  "fetched_at": "2026-08-10T16:11:27.338594+00:00"
  },
  {
   "_id": "2a48a16d-8009-366a-9a96-892da516e80f",
@@ -2823,48 +2442,6 @@
     }
    ]
   },
-  "fetched_at": "2026-08-10T15:36:35.460470+00:00"
- },
- {
-  "_id": "0b2e099b-d822-3210-a2ee-e133717f26da",
-  "tickers": [
-   "TQQQ"
-  ],
-  "title": "\u2018An Absolute Casino.\u2019 The $500 Billion Leveraged ETF Craze Proving Buffett Right",
-  "summary": "Warren Buffett called it a casino. A sitting Treasury Secretary called it lottery behavior. Now a half-trillion dollars in concentrated leverage is quietly reshaping how everyday stocks move, and almost nobody in the chain wants it to stop.",
-  "content_type": "STORY",
-  "pub_date": "2026-07-13T14:42:34Z",
-  "provider": {
-   "displayName": "24/7 Wall St.",
-   "url": "https://247wallst.com/",
-   "sourceId": "24_7_wall_st__718"
-  },
-  "canonical_url": {
-   "url": "https://247wallst.com/investing/2026/07/13/an-absolute-casino-the-500-billion-leveraged-etf-craze-proving-buffett-right/",
-   "site": "finance",
-   "region": "US",
-   "lang": "en-US"
-  },
-  "thumbnail": {
-   "originalUrl": "https://media.zenfs.com/en/24_7_wall_st__718/019bf2759fec7a023d5be2fca721cf88",
-   "originalWidth": 1366,
-   "originalHeight": 768,
-   "caption": "",
-   "resolutions": [
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/pEDeKq0E7g2yF8yEvFECIw--~B/aD03Njg7dz0xMzY2O2FwcGlkPXl0YWNoeW9u/https://media.zenfs.com/en/24_7_wall_st__718/019bf2759fec7a023d5be2fca721cf88",
-     "width": 1366,
-     "height": 768,
-     "tag": "original"
-    },
-    {
-     "url": "https://s.yimg.com/uu/api/res/1.2/x8uCU6jJgh3JcBIxjdA97A--~B/Zmk9c3RyaW07aD0xMjg7dz0xNzA7YXBwaWQ9eXRhY2h5b24-/https://media.zenfs.com/en/24_7_wall_st__718/019bf2759fec7a023d5be2fca721cf88",
-     "width": 170,
-     "height": 128,
-     "tag": "170x128"
-    }
-   ]
-  },
-  "fetched_at": "2026-08-10T15:36:35.460476+00:00"
+  "fetched_at": "2026-08-10T16:11:27.338596+00:00"
  }
 ]
