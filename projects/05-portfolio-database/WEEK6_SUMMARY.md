@@ -71,19 +71,24 @@ consumed, so a partial sale carries a partial fee.
 
 ## Results
 
-| Measure | Value |
+Values are **indexed to current market value = 100**, the same convention the
+capstone site uses. Every ratio and conclusion below is unchanged; only the
+scale is withheld.
+
+| Measure | Indexed |
 |:--|--:|
 | Open positions | 14 |
-| Cost basis (FIFO) | $26,008.97 |
-| Market value | $21,523.57 |
-| Unrealized P&L | −$4,485.41 |
-| Realized P&L (FIFO, net of fees) | +$1,864.03 |
-| Dividend & interest income | +$46.56 |
-| **Total P&L** | **−$2,574.82** |
+| Cost basis (FIFO) | 120.8 |
+| Market value | 100.0 |
+| Unrealized P&L | −20.8 |
+| Realized P&L (FIFO, net of fees) | +8.7 |
+| Dividend & interest income | +0.2 |
+| **Total P&L** | **−12.0** |
 
-Realized trading has been profitable across 57 tickers with closed round trips —
-ONDS (+$566 over 73 round trips), UAMY (+$417), MU (+$365), NBIS (+$267). The
-overall loss comes entirely from open positions.
+Realized trading has been profitable across 57 tickers with closed round trips.
+The best four by return on closed cost: NBIS +11.9% (5 round trips), MU +5.9%
+(19), UAMY +4.9% (21), ONDS +2.9% (73). The overall loss comes entirely from
+open positions.
 
 ![Portfolio value](results/portfolio_value.png)
 
@@ -91,13 +96,13 @@ overall loss comes entirely from open positions.
 
 ### What the sector query surfaces
 
-| Sector | Holdings | Market value | % of portfolio |
-|:--|--:|--:|--:|
-| Trading–Leveraged Equity | 7 | $8,939.88 | 41.5% |
-| Technology | 2 | $6,380.89 | 29.7% |
-| Industrials | 2 | $3,544.20 | 16.5% |
-| Communication Services | 2 | $2,198.40 | 10.2% |
-| Real Estate | 1 | $460.20 | 2.1% |
+| Sector | Holdings | % of portfolio |
+|:--|--:|--:|
+| Trading–Leveraged Equity | 7 | 41.5% |
+| Technology | 2 | 29.7% |
+| Industrials | 2 | 16.5% |
+| Communication Services | 2 | 10.2% |
+| Real Estate | 1 | 2.1% |
 
 Two facts fall out that no brokerage screen was showing. First, leveraged 2x
 ETFs are the single largest exposure at 41.5% across seven positions — a

@@ -37,7 +37,11 @@ logs/
 # Week 6 analytics output — contains real position sizes, cost basis and P&L.
 # Excluded by default because this repo is intended to be shown publicly.
 # Remove these two lines if you decide the numbers are fine to publish.
-projects/05-portfolio-database/results/
+projects/05-portfolio-database/results/*
+# ...except the two charts referenced by WEEK6_SUMMARY.md, which are
+# generated in indexed form (latest = 100) and carry no account values.
+!projects/05-portfolio-database/results/portfolio_value.png
+!projects/05-portfolio-database/results/sector_exposure.png
 
 # Editor/agent local config. Excluded because launch.json here points at an
 # absolute path in a different project (~/Desktop/tailguard) and is specific to

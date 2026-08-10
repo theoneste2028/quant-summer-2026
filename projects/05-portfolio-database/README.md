@@ -52,7 +52,8 @@ the SQLite Viewer extension.
 - `WEEK5_SUMMARY.md`, `WEEK6_SUMMARY.md` — writeups
 
 ## Headline result
-14 open positions, $21.5k market value, +$1,864 realized (FIFO, net of fees)
-against −$4,485 unrealized. The sector query surfaced a 41.5% concentration in
+14 open positions. Indexed to market value = 100: cost basis 120.8, realized
+P&L +8.7 (FIFO, net of fees) against −20.8 unrealized. The sector query
+surfaced a 41.5% concentration in
 leveraged 2x ETFs across seven positions — invisible when each is viewed on its
 own, and the source of the four largest unrealized losses.

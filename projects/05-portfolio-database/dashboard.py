@@ -46,7 +46,13 @@ def _fmt(df: pd.DataFrame, max_rows=15) -> str:
 # ---------------------------------------------------------------------------
 # Charts
 # ---------------------------------------------------------------------------
-def make_charts(results: dict, outdir=RESULTS_DIR):
+def make_charts(results: dict, outdir=RESULTS_DIR, index=False):
+    """Write the charts. `index` rescales money to a base of 100.
+
+    The indexed form is what gets committed: this repository is public, and the
+    shape of the series — which is the whole point of the chart — is identical
+    either way. Absolute account values add nothing to the analysis.
+    """
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -54,12 +60,17 @@ def make_charts(results: dict, outdir=RESULTS_DIR):
 
     pv = results.get("portfolio_value")
     if pv is not None and not pv.empty:
+        series = pv["portfolio_value"]
+        if index:
+            series = series / series.iloc[-1] * 100.0
         fig, ax = plt.subplots(figsize=(10, 5))
         d = pd.to_datetime(pv["date"])
-        ax.plot(d, pv["portfolio_value"], color="0.25", lw=1.4)
-        ax.fill_between(d, pv["portfolio_value"], color="0.75", alpha=0.4)
-        ax.set_title("Portfolio market value over time")
-        ax.set_xlabel("Date"); ax.set_ylabel("Value ($)")
+        ax.plot(d, series, color="0.25", lw=1.4)
+        ax.fill_between(d, series, color="0.75", alpha=0.4)
+        ax.set_title("Portfolio market value over time"
+                     + (" (indexed, latest = 100)" if index else ""))
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Index (latest = 100)" if index else "Value ($)")
         ax.grid(alpha=0.3)
         fig.autofmt_xdate(); fig.tight_layout()
         fig.savefig(os.path.join(outdir, "portfolio_value.png"), dpi=130)
@@ -180,7 +191,9 @@ def main(argv):
         print(f"  Total P&L             {unreal + real + inc:>12,.2f}")
 
     if not wanted:
-        make_charts(results)
+        # Indexed by default: the two charts committed to this public repo must
+        # not carry account values. `--absolute` restores real dollars locally.
+        make_charts(results, index="--absolute" not in argv)
         write_markdown(results)
         print(f"\nCharts + results table written to: {RESULTS_DIR}")
     con.close()

@@ -86,8 +86,9 @@ disagree.
 
 ## What the analytics actually showed
 
-Once the data was trustworthy: 14 open positions, $21.5k market value, +$1,864
-realised across 57 tickers with closed round trips, against −$4,485 unrealised.
+Once the data was trustworthy: 14 open positions, and — indexing to market
+value = 100 — a cost basis of 120.8, realised P&L of +8.7 across 57 tickers with
+closed round trips, against −20.8 unrealised.
 
 The sector query surfaced something no brokerage screen had shown me: **41.5% of
 the portfolio sat in leveraged 2× ETFs**, spread across seven separate
