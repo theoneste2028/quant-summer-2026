@@ -3,7 +3,7 @@
 A 12-week quantitative finance platform built to consolidate three Northwestern
 courses, ending in a portfolio optimizer that runs on a real brokerage history.
 
-**Status:** complete — all 12 weeks · **671 tests across 12 suites, all passing**
+**Status:** complete — all 12 weeks · **740 tests across 12 suites, all passing**
 (`python run_all_tests.py`)
 
 📊 **[Live results page](site/capstone.html)** — self-contained, no build step.
@@ -74,6 +74,11 @@ caches results, and draws them.
 - **Controls:** risk tolerance, position cap, shrunk vs raw estimates, which
   assets are allowed, a date window, the fat-tail model, simulation paths and
   seed.
+- **Your own tickers and positions:** add tickers you are considering to the
+  optimizer's universe, and set the share counts you actually hold when the
+  database is behind your account. Prices for tickers the database lacks are
+  fetched on request into a separate cache; the portfolio database is never
+  written to.
 - **Views:** current vs recommended, the efficient frontier, how the answer
   moves with risk tolerance, one-year simulations under normal and fat-tailed
   shocks, per-asset statistics, and exactly what data went in.
@@ -83,8 +88,9 @@ caches results, and draws them.
 - **Reproducible:** at the default controls with 100,000 paths it shows the
   published numbers exactly, and its Data tab prints the code to reproduce any
   other configuration from the command line.
-- **Private by default:** values are indexed to 100 unless you switch to
-  dollars, and it makes no network calls.
+- **Private by default:** values are indexed to 100 and share counts hidden
+  unless you switch to dollars. The only network call is the "Fetch prices"
+  button, which sends ticker symbols and nothing else.
 
 ## Projects
 
@@ -154,7 +160,7 @@ streamlit run projects/11-capstone-platform/app.py         # opens in your brows
 ### Test
 
 ```bash
-python run_all_tests.py                                    # all 671 checks, ~95 s
+python run_all_tests.py                                    # all 740 checks, ~2 min
 python run_all_tests.py --fast                             # skip the slow suites
 ```
 

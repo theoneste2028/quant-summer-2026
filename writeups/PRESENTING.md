@@ -42,7 +42,7 @@ Pick three or four. Each leads with the artifact, not the coursework.
 > random numbers.
 
 **Testing**
-> Wrote 671 assertion-based tests across 12 suites, catching four defects that
+> Wrote 740 assertion-based tests across 12 suites, catching four defects that
 > code review had missed — including an index that silently changed which rows a
 > report returned.
 
@@ -71,7 +71,7 @@ Pick three or four. Each leads with the artifact, not the coursework.
 > which I had spent a month measuring, turn out to barely affect one-year risk
 > because the Central Limit Theorem washes them out. Both are written up.
 >
-> Python · SQL · CVXPY · Monte Carlo · 671 tests
+> Python · SQL · CVXPY · Monte Carlo · 740 tests
 
 ---
 
@@ -150,7 +150,7 @@ Show the frontier chart with both portfolios.
 > confident number."
 
 **4:25 — Close** *(≈20s)*
-> "671 tests across twelve suites. Four real defects came from tests rather than
+> "740 tests across twelve suites. Four real defects came from tests rather than
 > review, including an index that changed which rows a report returned. Building
 > it was the easy half — establishing it tells the truth was the work."
 
@@ -169,7 +169,7 @@ Engineering student at Northwestern, building quantitative systems.
 12-week platform consolidating probability, data management, and engineering
 economics into a portfolio optimizer that runs on a real brokerage history.
 SQLite data layer, CVXPY optimization, utility-based selection, Monte Carlo
-risk. 671 tests.
+risk. 740 tests.
 
 Recent things I learned the hard way:
 - `INSERT OR IGNORE` is error suppression, not idempotency
@@ -185,7 +185,7 @@ Python · SQL · CVXPY · pandas · Monte Carlo
 
 ## Before you publish
 
-- [ ] `python run_all_tests.py` — expect 671 passed, 0 failed
+- [ ] `python run_all_tests.py` — expect 740 passed, 0 failed
 - [ ] Regenerate the site export if the model changed
 - [ ] Decide on `WEEK6_SUMMARY.md`, which contains aggregate dollar figures.
       The site page is already indexed to 100; the summary is not.

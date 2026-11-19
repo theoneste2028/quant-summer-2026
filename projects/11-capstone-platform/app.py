@@ -14,9 +14,17 @@ the decision and simulation, and never reloads data or re-fits distributions.
 database file's modification time, so after the Week 7 ETL appends prices the
 next interaction recomputes on the new data.
 
+Your own tickers and positions: "Add tickers" puts names you are considering
+into the optimizer's universe, and the positions table lets you set the share
+counts you actually hold when the database is behind your account. Prices for
+tickers the database lacks come from a separate cache (market_data.py), filled
+only when you press "Fetch prices"; the portfolio database is never written.
+Edited positions can be saved to data/<database>_positions.csv (gitignored).
+
 Privacy: values are indexed to 100 by default, the convention the published
-results page uses. Dollar amounts are one toggle away and never leave the
-machine — this app reads a local SQLite file and makes no network calls.
+results page uses. Dollar amounts and share counts are one toggle away and
+never leave the machine. The only network call is the "Fetch prices" button,
+and it sends ticker symbols alone — never share counts or values.
 
 Run (from the repo root):
     streamlit run projects/11-capstone-platform/app.py
@@ -36,6 +44,7 @@ import streamlit as st
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import capstone as cs                                    # noqa: E402
+import market_data as md                                 # noqa: E402
 from charts import simulate_wealth_paths                 # noqa: E402
 
 # Entity colours, validated with the dataviz palette checker on BOTH the light
@@ -93,19 +102,67 @@ def db_summary(db_path: str, mtime: float) -> dict:
     finally:
         con.close()
     return {"first": lo, "last": hi, "rows": n_rows, "tickers": n_tickers,
-            "counts": counts, "held": cs.held_tickers(db_path)}
+            "counts": counts, "held": cs.held_tickers(db_path),
+            "positions": cs.normalize_positions(cs.held_positions(db_path))}
+
+
+def positions_file(db_path: str) -> str:
+    """Where edited positions for this database are saved: next to it as
+    <name>_positions.csv (data/ is gitignored). Overridable for the tests."""
+    folder = os.environ.get("RESEARCH_POSITIONS_DIR", os.path.dirname(db_path))
+    stem = os.path.splitext(os.path.basename(db_path))[0]
+    return os.path.join(folder, f"{stem}_positions.csv")
+
+
+def editor_positions(df: pd.DataFrame) -> tuple[tuple, list[str]]:
+    """The positions table as entered -> (normalised positions, problems).
+
+    Blank rows are ignored. A row that cannot be used is left out and named in
+    `problems` rather than guessed at, so nothing is silently misread.
+    """
+    pairs, problems, seen = [], [], set()
+    for _, r in df.iterrows():
+        t, q = r.get("Ticker"), r.get("Shares")
+        t = "" if t is None or (isinstance(t, float) and np.isnan(t)) else str(t).strip()
+        q_missing = q is None or pd.isna(q)
+        if not t and q_missing:
+            continue
+        if not t:
+            problems.append("a row has shares but no ticker")
+            continue
+        syms, bad = md.parse_tickers(t)
+        if bad or len(syms) != 1:
+            problems.append(f"{t!r} is not a ticker symbol")
+            continue
+        t = syms[0]
+        if q_missing:
+            problems.append(f"{t} has no share count")
+            continue
+        if float(q) < 0:
+            problems.append(f"{t} has negative shares (long-only)")
+            continue
+        if t in seen:
+            problems.append(f"{t} is listed twice — the share counts are added")
+        seen.add(t)
+        pairs.append((t, float(q)))
+    return cs.normalize_positions(pairs), problems
 
 
 # ===========================================================================
 # Cached pipeline stages
 # ===========================================================================
-# DataKey = (db_path, mtime, min_days, exclude, start, end). All primitives, so
-# Streamlit hashes them cheaply and exactly.
+# DataKey = (db_path, mtime, min_days, exclude, start, end, candidates,
+# positions, cache_mtime). All primitives or tuples of them, so Streamlit
+# hashes them cheaply and exactly. `candidates` and `positions` are None when
+# unchanged, which keeps the default path identical to the CLI's.
 
 @st.cache_data(show_spinner=False, max_entries=16)
 def get_data(key: tuple) -> dict:
-    db_path, _mtime, min_days, exclude, start, end = key
-    return cs.stage_data(db_path, min_days, None, exclude, start, end)
+    (db_path, _mtime, min_days, exclude, start, end, candidates, positions,
+     _cache_mtime) = key
+    return cs.stage_data(db_path, min_days,
+                         list(candidates) if candidates is not None else None,
+                         exclude, start, end, positions, md.CACHE_DB)
 
 
 @st.cache_data(show_spinner=False, max_entries=16)
@@ -243,10 +300,133 @@ st.sidebar.caption(
     f"{info['tickers']} tickers · file updated "
     f"{datetime.fromtimestamp(mtime):%Y-%m-%d %H:%M}")
 
+# ---- Holdings: what you actually own --------------------------------------
+st.sidebar.subheader("Holdings")
+db_positions = info["positions"]
+pos_path = positions_file(db_path)
+saved_positions, saved_error = None, None
+if os.path.exists(pos_path):
+    try:
+        saved_positions = cs.read_positions(pos_path)
+    except (OSError, ValueError, KeyError) as e:
+        saved_error = f"Could not read {os.path.basename(pos_path)}: {e}"
+base_positions = saved_positions if saved_positions is not None else db_positions
+
+with st.sidebar.expander("Positions (shares you hold)", expanded=False):
+    st.caption("Starts from your trades in the database. Edit share counts, "
+               "add rows for positions the database does not have yet, or "
+               "delete rows you have sold.")
+    # The key carries the base it was opened on: after Save or Revert the base
+    # changes, and the editor starts again from it rather than replaying edits
+    # made against a different table.
+    edited = st.data_editor(
+        pd.DataFrame({"Ticker": [t for t, _ in base_positions],
+                      "Shares": [q for _, q in base_positions]},
+                     ).astype({"Ticker": "object", "Shares": "float64"}),
+        key=f"positions_{abs(hash(base_positions))}",
+        num_rows="dynamic", hide_index=True, use_container_width=True,
+        column_config={
+            "Ticker": st.column_config.TextColumn(max_chars=15),
+            "Shares": st.column_config.NumberColumn(min_value=0.0,
+                                                    format="%.4f"),
+        })
+    positions_now, position_problems = editor_positions(edited)
+    for p in position_problems:
+        st.warning(p)
+    if saved_error:
+        st.error(saved_error)
+    unsaved = positions_now != base_positions
+    b1, b2 = st.columns(2)
+    if b1.button("Save", disabled=not unsaved, use_container_width=True,
+                 help=f"Write these positions to "
+                      f"{os.path.relpath(pos_path, cs.REPO)} so they are used "
+                      f"next time. The file stays on this machine (gitignored)."):
+        cs.write_positions(pos_path, positions_now)
+        st.rerun()
+    if b2.button("Use database", use_container_width=True,
+                 disabled=saved_positions is None and not unsaved,
+                 help="Discard edits and delete the saved positions file, "
+                      "going back to the positions in the trades table."):
+        if os.path.exists(pos_path):
+            os.remove(pos_path)
+        st.session_state.pop(f"positions_{abs(hash(base_positions))}", None)
+        st.rerun()
+
+# None = the trades table, so an untouched table runs the CLI's exact path.
+positions = None if positions_now == db_positions else positions_now
+held_now = ([t for t, _ in positions] if positions is not None
+            else list(info["held"]))
+if positions is None:
+    st.sidebar.caption(f"Using the {len(db_positions)} open positions in the "
+                       f"database's trades.")
+else:
+    where = ("saved file" if not unsaved
+             else "edited, not saved — Save to keep them")
+    st.sidebar.caption(f"Using {len(positions)} positions as entered "
+                       f"({where}), not the trades table.")
+
+# ---- Universe: what the optimizer may use ---------------------------------
 st.sidebar.subheader("Universe")
-pool = list(dict.fromkeys(info["held"] + cs.CANDIDATE_ETFS))
+added_text = st.sidebar.text_input(
+    "Add tickers", placeholder="e.g. AAPL, MSFT, VNQ",
+    help="Tickers to consider buying. They join the candidates the optimizer "
+         "may use. Separate with commas or spaces. Tickers you hold belong in "
+         "the positions table instead.")
+added, added_bad = md.parse_tickers(added_text)
+if added_bad:
+    st.sidebar.warning("Not ticker symbols, ignored: " + ", ".join(added_bad))
+new_candidates = [t for t in added
+                  if t not in held_now and t not in cs.CANDIDATE_ETFS]
+already = [t for t in added if t not in new_candidates]
+if already:
+    st.sidebar.caption("Already in the universe: " + ", ".join(already))
+candidates = (tuple(cs.CANDIDATE_ETFS) + tuple(new_candidates)
+              if new_candidates else None)
+
+# Prices: the database first; anything it has never priced comes from the
+# research cache, which only fills when asked.
+cache_info = md.cached_tickers()
+cache_mtime = (os.path.getmtime(md.CACHE_DB) if os.path.exists(md.CACHE_DB)
+               else 0.0)
+needs_price = [t for t in dict.fromkeys(held_now + new_candidates)
+               if t not in info["counts"]]
+unpriced = [t for t in needs_price if t not in cache_info]
+from_cache = [t for t in needs_price if t in cache_info]
+fetch_result = st.session_state.pop("fetch_result", None)
+if fetch_result:
+    if fetch_result["stored"]:
+        st.sidebar.success("Fetched " + ", ".join(
+            f"{t} ({n:,} days)" for t, n in fetch_result["stored"].items()))
+    if fetch_result["missing"]:
+        st.sidebar.warning("No prices found for " + ", ".join(
+            fetch_result["missing"]) + " — check the symbol (Yahoo format, "
+            "e.g. BRK-B).")
+    for t, err in fetch_result["errors"].items():
+        st.sidebar.error(f"{t}: fetch failed — {err}")
+if unpriced:
+    st.sidebar.warning(f"No prices yet for {', '.join(unpriced)}. Until they "
+                       f"are fetched they are left out of the analysis.")
+to_fetch = unpriced or from_cache
+if to_fetch:
+    label = ("Fetch prices" if unpriced
+             else f"Update fetched prices ({len(from_cache)})")
+    if st.sidebar.button(
+            label, help="Downloads about five years of adjusted daily closes "
+                        "from Yahoo Finance for: " + ", ".join(to_fetch) +
+                        ". Only the ticker symbols are sent. Stored in "
+                        f"{os.path.relpath(md.CACHE_DB, cs.REPO)}, never in "
+                        "the portfolio database."):
+        with st.spinner(f"Fetching {', '.join(to_fetch)}…"):
+            st.session_state["fetch_result"] = md.fetch(to_fetch)
+        st.rerun()
+
+pool = list(dict.fromkeys(held_now + cs.CANDIDATE_ETFS + new_candidates))
+# Keep earlier removals that are still in the pool when the pool changes.
+if "exclude" in st.session_state:
+    st.session_state["exclude"] = [t for t in st.session_state["exclude"]
+                                   if t in pool]
 exclude = st.sidebar.multiselect(
-    "Remove from the universe", pool, default=[],
+    "Remove from the universe", pool, key="exclude",
     help="Held positions and candidate ETFs the optimizer may use. Removing a "
          "held position also removes it from the current-portfolio comparison.")
 min_days = int(st.sidebar.number_input(
@@ -306,7 +486,8 @@ dollars = st.sidebar.radio(
 # ===========================================================================
 # Run the stages
 # ===========================================================================
-key = (db_path, mtime, min_days, tuple(sorted(exclude)), start, end)
+key = (db_path, mtime, min_days, tuple(sorted(exclude)), start, end,
+       candidates, positions, cache_mtime)
 
 st.title("Portfolio research")
 
@@ -358,7 +539,8 @@ is_published = (estimates == "robust" and max_weight == 0.25
                 and risk_fraction == 0.25 and tail_choice == "fitted"
                 and seed == 7 and n_paths == 100_000 and not exclude
                 and start is None and end is None and min_days == 400
-                and db_path == cs.DB_PATH)
+                and db_path == cs.DB_PATH and candidates is None
+                and positions is None)
 
 st.caption(
     f"{d['start']} → {d['end']} · {d['n_days']} trading days · "
@@ -367,6 +549,10 @@ st.caption(
     + f" · cap {'none' if max_weight is None else f'{max_weight:.0%}'}"
     + f" · R = {risk_fraction:.0%} of wealth · t df {t_df:.1f}"
     + f" · {n_paths:,} paths, seed {seed}"
+    + (f" · +{n_added} added" if (n_added := sum(t in tickers
+                                                  for t in new_candidates))
+       else "")
+    + (" · positions as entered" if positions is not None else "")
     + (" · **the published configuration**" if is_published else ""))
 
 # ---- Caveats that change how to read everything below ---------------------
@@ -387,9 +573,25 @@ elif covered < 0.999:
             f"({', '.join(missing)}), because those positions are outside the "
             f"universe. The current portfolio below is the remaining "
             f"{covered:.1%}, rescaled to 100%.")
+pos_table = s1["positions"]
+no_price = list(pos_table.loc[pos_table["price"].isna(), "ticker"])
+if no_price:
+    st.warning(f"No price for {', '.join(no_price)}, so "
+               f"{'it is' if len(no_price) == 1 else 'they are'} not counted in "
+               f"the current portfolio. Fetch prices in the sidebar.")
+dated = pos_table["price_date"].dropna()
+if len(dated) and (date.fromisoformat(dated.max())
+                   - date.fromisoformat(dated.min())).days > 5:
+    st.warning(f"Positions are valued at prices from different dates "
+               f"({dated.min()} to {dated.max()}), so the current weights mix "
+               f"old and new prices. Bring the database up to date with the "
+               f"ETL (projects/07-etl-pipeline/etl.py) to line them up.")
 if s1["portfolio_value"] <= 0:
-    st.info("This database has no open positions with prices, so values are "
-            "indexed to 100 regardless of the display setting.")
+    st.info(("This database has no open positions with prices"
+             if positions is None else
+             "None of the positions entered has a price yet")
+            + ", so values are indexed to 100 regardless of the display "
+              "setting.")
     dollars, scale = False, 1.0
 
 (tab_rec, tab_front, tab_risk, tab_sim, tab_stats, tab_data) = st.tabs(
@@ -773,10 +975,14 @@ with tab_data:
                 f"{datetime.fromtimestamp(mtime):%Y-%m-%d %H:%M}. "
                 f"The app recomputes automatically when the file changes "
                 f"(for example after the daily ETL run).")
-    held_set = set(d["held"])
+    held_set, added_set = set(d["held"]), set(new_candidates)
+    fetched_set = set(d.get("fetched", []))
     uni = pd.DataFrame({
         "Ticker": tickers,
-        "Role": ["held" if t in held_set else "candidate" for t in tickers],
+        "Role": ["held" if t in held_set else
+                 "added" if t in added_set else "candidate" for t in tickers],
+        "Prices from": ["research cache" if t in fetched_set else "database"
+                        for t in tickers],
         "Current weight %": [float(alloc.get(t, 0.0)) * 100 for t in tickers],
     })
     st.subheader(f"Universe — {len(tickers)} assets")
@@ -800,15 +1006,36 @@ with tab_data:
         st.write(", ".join(sorted(d["user_excluded"])) or "None.")
 
     st.subheader("Current portfolio")
-    cp = pd.DataFrame({"Ticker": alloc.index,
-                       "Weight %": alloc.values * 100,
-                       "Modelled": ["yes" if t in tickers else "no"
-                                    for t in alloc.index]})
-    st.dataframe(cp.sort_values("Weight %", ascending=False),
-                 hide_index=True, use_container_width=True,
-                 column_config={"Weight %": st.column_config.NumberColumn(format="%.1f")})
-    st.caption(f"{covered:.1%} of current value is modelled. Weights are by "
-               f"market value at the latest price, from FIFO open lots.")
+    pt = pos_table
+    cp = pd.DataFrame({
+        "Ticker": pt["ticker"],
+        "Shares": pt["shares"],
+        "Price": pt["price"],
+        "Price date": pt["price_date"].fillna("—"),
+        "Value": pt["value"] * scale,
+        "Weight %": [float(alloc.get(t, 0.0)) * 100 for t in pt["ticker"]],
+        "Modelled": ["yes" if t in tickers else
+                     "no price" if t in no_price else "no" for t in pt["ticker"]],
+    }).sort_values(["Weight %", "Ticker"], ascending=[False, True])
+    if not dollars:
+        # Shares × price is the account size, which the indexed view hides.
+        cp = cp.drop(columns=["Shares", "Price"])
+    st.dataframe(cp, hide_index=True, use_container_width=True,
+                 column_config={
+                     "Shares": st.column_config.NumberColumn(format="%.4f"),
+                     "Price": st.column_config.NumberColumn(format="$%.2f"),
+                     "Value": st.column_config.NumberColumn(
+                         format="$%.0f" if dollars else "%.1f",
+                         help="Market value in dollars" if dollars else
+                              "Market value, indexed so the whole portfolio "
+                              "is 100"),
+                     "Weight %": st.column_config.NumberColumn(format="%.1f")})
+    st.caption(f"{covered:.1%} of current value is modelled. Each position is "
+               f"valued at its latest close"
+               + (" from the trades table's FIFO open lots." if positions is None
+                  else ", using the share counts entered in the sidebar.")
+               + ("" if dollars else " Switch Values to Dollars to see share "
+                                     "counts and prices."))
 
     st.subheader("Reproduce from the command line")
     if is_published:
@@ -816,7 +1043,17 @@ with tab_data:
         st.caption("This is the published configuration; the CLI prints the "
                    "same numbers.")
     else:
+        extras = ""
+        if candidates is not None:
+            extras += (f"candidates=(*cs.CANDIDATE_ETFS, "
+                       f"{', '.join(repr(t) for t in new_candidates)}), ")
+        if positions is not None:
+            extras += (f"positions=cs.read_positions("
+                       f"{os.path.relpath(pos_path, cs.REPO)!r}), ")
+        if d.get("fetched") or positions is not None:
+            extras += f"extra_db={os.path.relpath(md.CACHE_DB, cs.REPO)!r}, "
         cfg = (f"cs.PipelineConfig(db_path={os.path.relpath(db_path, cs.REPO)!r}, "
+               f"{extras}"
                f"min_days={min_days}, exclude={tuple(sorted(exclude))!r}, "
                f"start={start!r}, end={end!r}, estimates={estimates!r}, "
                f"max_weight={max_weight!r}, risk_fraction={risk_fraction!r}, "
@@ -827,4 +1064,7 @@ with tab_data:
                 f"out = cs.pipeline({cfg})\n"
                 "cs.print_report(out)", language="python")
         st.caption("Run from the repo root. Differences from the defaults are "
-                   "spelled out so the result is reproducible.")
+                   "spelled out so the result is reproducible."
+                   + (" Your edited positions are not saved yet — press Save "
+                      "in the sidebar so the file matches what you see here."
+                      if positions is not None and unsaved else ""))

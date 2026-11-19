@@ -157,7 +157,7 @@ return. They earn their place through low correlation — which is what an
 optimizer is for, and what eyeballing a portfolio cannot do.
 
 ## Testing
-`test_capstone.py` runs **108 checks**. Estimators are scored against a synthetic
+`test_capstone.py` runs **142 checks**. Estimators are scored against a synthetic
 market with a *known* covariance, so shrinkage can be shown to actually improve
 the estimate rather than merely change it. Structural invariants: weights sum to
 1 and respect the cap; higher risk aversion lowers both return and volatility; a
@@ -168,11 +168,15 @@ pipeline end to end.
 The pipeline's interface is tested too: configuration defaults and
 validation, ticker exclusion, date windows, the infeasible-cap error, and that
 the decision is unchanged when wealth is rescaled — the property that lets the
-research app show values indexed to 100. `test_app.py` adds 38 checks that drive
-the app headlessly, including that it reproduces `site/capstone.json` at the
-published settings.
+research app show values indexed to 100. Positions entered by hand and the
+separate price cache are tested offline: shares × price weights, the database
+winning over the cache, re-fetches replacing rather than appending, and that
+entering the database's own positions changes nothing. `test_app.py` adds 73
+checks that drive the app headlessly, including that it reproduces
+`site/capstone.json` at the published settings and that adding tickers and
+editing, saving and reverting positions all work.
 
-All pass, and the repo-wide suite is at **671 passed, 0 failed**.
+All pass, and the repo-wide suite is at **740 passed, 0 failed**.
 
 ## Honest limitations
 - **The window is short and flattering.** 450 days covering a strong market.

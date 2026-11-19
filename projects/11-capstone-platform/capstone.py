@@ -106,8 +106,88 @@ def held_tickers(db_path=DB_PATH) -> list[str]:
         con.close()
 
 
+def held_positions(db_path=DB_PATH) -> dict[str, float]:
+    """{ticker: net shares} for open positions, alphabetically.
+
+    Net shares (buys minus sells) equal the FIFO open quantity that
+    `current_allocation` values, since FIFO only decides WHICH lots remain.
+    """
+    con = sqlite3.connect(db_path)
+    try:
+        return dict(con.execute("""
+            SELECT ticker,
+                   SUM(CASE side WHEN 'BUY' THEN quantity ELSE -quantity END) AS q
+            FROM trades GROUP BY ticker HAVING q > 1e-9 ORDER BY ticker"""))
+    finally:
+        con.close()
+
+
+def normalize_positions(positions) -> tuple:
+    """Positions as a sorted tuple of (TICKER, shares) with shares > 0.
+
+    Accepts a dict or an iterable of pairs. Tickers are stripped and
+    upper-cased; a ticker listed twice has its shares added; zero-share rows
+    are dropped (a position you no longer hold). Blank tickers, negative or
+    non-finite share counts raise ValueError: the pipeline is long-only, and a
+    short position entered by mistake should be an error, not silently zero.
+    """
+    pairs = positions.items() if isinstance(positions, dict) else positions
+    total: dict[str, float] = {}
+    for t, q in pairs:
+        t = str(t).strip().upper()
+        if not t:
+            raise ValueError("A position has no ticker.")
+        try:
+            q = float(q)
+        except (TypeError, ValueError):
+            raise ValueError(f"{t}: shares must be a number, got {q!r}") from None
+        if not np.isfinite(q) or q < 0:
+            raise ValueError(f"{t}: shares must be zero or more, got {q}")
+        total[t] = total.get(t, 0.0) + q
+    return tuple(sorted((t, q) for t, q in total.items() if q > 1e-9))
+
+
+def read_positions(path: str) -> tuple:
+    """Positions from a CSV with columns `ticker,shares`."""
+    import csv
+    with open(path, newline="") as f:
+        rows = list(csv.DictReader(f))
+    if rows and not {"ticker", "shares"} <= set(rows[0]):
+        raise ValueError(f"{path}: expected columns 'ticker,shares'")
+    return normalize_positions((r["ticker"], r["shares"]) for r in rows)
+
+
+def write_positions(path: str, positions) -> None:
+    """Write positions as `ticker,shares` CSV (the format read_positions reads).
+    `repr` keeps every digit, so a round trip returns identical floats."""
+    import csv
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with open(path, "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["ticker", "shares"])
+        for t, q in normalize_positions(positions):
+            w.writerow([t, repr(float(q))])
+
+
+def _db_tickers(con) -> set[str]:
+    """Every ticker with at least one price in this database."""
+    return {r[0] for r in con.execute("SELECT DISTINCT ticker FROM prices")}
+
+
+def _open_extra(extra_db):
+    """Read-only connection to the research price cache, or None if absent."""
+    if not extra_db or not os.path.exists(extra_db):
+        return None
+    con = sqlite3.connect(f"file:{extra_db}?mode=ro", uri=True)
+    if not con.execute("SELECT 1 FROM sqlite_master WHERE type='table' "
+                       "AND name='prices'").fetchone():
+        con.close()
+        return None
+    return con
+
+
 def load_returns(db_path=DB_PATH, min_days=400, extra=None, exclude=(),
-                 start=None, end=None) -> dict:
+                 start=None, end=None, held=None, extra_db=None) -> dict:
     """Build a returns matrix from the SQLite prices table.
 
     Universe = currently-held positions with enough price history, plus the
@@ -120,9 +200,14 @@ def load_returns(db_path=DB_PATH, min_days=400, extra=None, exclude=(),
     restrict the date window; history is then counted inside the window, so
     `min_days` always means "at least this many prices in the data actually
     used". With the defaults the behaviour is unchanged.
+
+    `held` replaces the held list derived from trades (positions entered by
+    hand). `extra_db` is a second price source — the research price cache —
+    used ONLY for tickers with no prices at all in `db_path`; a ticker is never
+    stitched together from both. Those tickers are listed under "fetched".
     """
     con = sqlite3.connect(db_path)
-    held = _held(con)
+    held = _held(con) if held is None else sorted(set(held))
     if start is None and end is None:
         counts = dict(con.execute(
             "SELECT ticker, COUNT(*) FROM prices GROUP BY ticker").fetchall())
@@ -131,11 +216,22 @@ def load_returns(db_path=DB_PATH, min_days=400, extra=None, exclude=(),
             "SELECT ticker, COUNT(*) FROM prices WHERE date >= ? AND date <= ? "
             "GROUP BY ticker",
             (start or "0000-00-00", end or "9999-99-99")).fetchall())
+    in_db = _db_tickers(con)
+    xcon = _open_extra(extra_db)
+    if xcon is not None:
+        x_counts = dict(xcon.execute(
+            "SELECT ticker, COUNT(*) FROM prices WHERE date >= ? AND date <= ? "
+            "GROUP BY ticker",
+            (start or "0000-00-00", end or "9999-99-99")).fetchall())
+        counts.update({t: n for t, n in x_counts.items() if t not in in_db})
 
     candidates = list(extra if extra is not None else CANDIDATE_ETFS)
     exclude = set(exclude)
-    user_excluded = [t for t in held + candidates if t in exclude]
-    pool = [t for t in held + candidates if t not in exclude]
+    # A ticker can be both held and a candidate (QQQM, FDVV, ...). Count it once,
+    # or one asset listed twice would pass the "at least two assets" check.
+    everything = list(dict.fromkeys(held + candidates))
+    user_excluded = [t for t in everything if t in exclude]
+    pool = [t for t in everything if t not in exclude]
     universe = [t for t in pool if counts.get(t, 0) >= min_days]
     excluded = {t: counts.get(t, 0) for t in pool
                 if counts.get(t, 0) < min_days}
@@ -146,10 +242,12 @@ def load_returns(db_path=DB_PATH, min_days=400, extra=None, exclude=(),
     # far too little to estimate a covariance matrix from.
     if len(universe) < 2:
         con.close()
+        if xcon is not None:
+            xcon.close()
         raise InsufficientDataError(
             f"\nNot enough price history in {os.path.basename(db_path)} to run "
             f"the optimizer.\n"
-            f"  Found {len(universe)} of {len(held) + len(candidates)} tickers "
+            f"  Found {len(universe)} of {len(everything)} tickers "
             f"with at least {min_days} days of prices.\n"
             + (f"  Excluded: "
                + ", ".join(f"{t} ({n}d)" for t, n in sorted(excluded.items())[:8])
@@ -166,11 +264,22 @@ def load_returns(db_path=DB_PATH, min_days=400, extra=None, exclude=(),
               "The --demo database is intentionally tiny and cannot support "
               "this step.\n")
 
+    from_db = [t for t in universe if t in in_db]
+    fetched = [t for t in universe if t not in in_db]
     rows = con.execute(
         f"SELECT ticker, date, close FROM prices WHERE ticker IN "
-        f"({','.join('?' * len(universe))}) ORDER BY date",
-        universe).fetchall()
+        f"({','.join('?' * len(from_db))}) ORDER BY date",
+        from_db).fetchall() if from_db else []
     con.close()
+    if fetched:
+        # Non-empty only if xcon exists: a ticker outside db_path can only have
+        # reached the universe through the cache's counts.
+        rows += xcon.execute(
+            f"SELECT ticker, date, close FROM prices WHERE ticker IN "
+            f"({','.join('?' * len(fetched))}) ORDER BY date",
+            fetched).fetchall()
+    if xcon is not None:
+        xcon.close()
 
     px = (pd.DataFrame(rows, columns=["ticker", "date", "close"])
           .pivot(index="date", columns="ticker", values="close")
@@ -198,6 +307,7 @@ def load_returns(db_path=DB_PATH, min_days=400, extra=None, exclude=(),
     return {"prices": px, "returns": rets, "universe": list(rets.columns),
             "held": held, "candidates": candidates, "excluded": excluded,
             "user_excluded": user_excluded,
+            "fetched": [t for t in rets.columns if t not in in_db],
             "start": str(rets.index[0]), "end": str(rets.index[-1]),
             "n_days": len(rets)}
 
@@ -260,6 +370,55 @@ def portfolio_value(db_path=DB_PATH) -> float:
     v = con.execute(q).fetchone()[0]
     con.close()
     return float(v)
+
+
+_LATEST = """SELECT ticker, date, close FROM
+               (SELECT ticker, date, close,
+                       ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) rn
+                FROM prices WHERE ticker IN ({}))
+             WHERE rn = 1"""
+
+
+def position_table(db_path=DB_PATH, positions=None, extra_db=None) -> pd.DataFrame:
+    """One row per position: ticker, shares, price, price_date, value, source.
+
+    `positions=None` means the open positions in the trades table. Each ticker
+    is priced at its latest close from the same source `load_returns` would
+    use — the portfolio database if it has any prices for it, else the research
+    price cache. A ticker with no price anywhere keeps NaN price and value, so
+    the caller can say so rather than value it at zero.
+    """
+    pos = (held_positions(db_path) if positions is None
+           else dict(normalize_positions(positions)))
+    tickers = list(pos)
+    latest = {}
+    if tickers:
+        con = sqlite3.connect(db_path)
+        try:
+            in_db = _db_tickers(con)
+            mine = [t for t in tickers if t in in_db]
+            if mine:
+                for t, d, c in con.execute(
+                        _LATEST.format(",".join("?" * len(mine))), mine):
+                    latest[t] = (d, float(c), "database")
+        finally:
+            con.close()
+        rest = [t for t in tickers if t not in in_db]
+        xcon = _open_extra(extra_db) if rest else None
+        if xcon is not None:
+            try:
+                for t, d, c in xcon.execute(
+                        _LATEST.format(",".join("?" * len(rest))), rest):
+                    latest[t] = (d, float(c), "fetched")
+            finally:
+                xcon.close()
+    rows = []
+    for t in tickers:
+        d, c, src = latest.get(t, (None, np.nan, "no price"))
+        rows.append({"ticker": t, "shares": float(pos[t]), "price": c,
+                     "price_date": d, "value": float(pos[t]) * c, "source": src})
+    return pd.DataFrame(rows, columns=["ticker", "shares", "price", "price_date",
+                                       "value", "source"])
 
 
 # ===========================================================================
@@ -576,8 +735,15 @@ class PipelineConfig:
     start: str | None = None           # 'YYYY-MM-DD', inclusive
     end: str | None = None
     tail_study: bool = True
+    positions: tuple | None = None     # ((ticker, shares), ...); None -> the trades table
+    extra_db: str | None = None        # research price cache for tickers not in db_path
 
     def __post_init__(self):
+        if self.positions is not None:
+            # Frozen dataclass: normalise in place once, so the config that is
+            # reported is the one that ran.
+            object.__setattr__(self, "positions",
+                               normalize_positions(self.positions))
         if self.estimates not in ESTIMATES:
             raise ValueError(f"estimates must be one of {ESTIMATES}, "
                              f"got {self.estimates!r}")
@@ -598,15 +764,37 @@ class PipelineConfig:
 
 
 def stage_data(db_path=DB_PATH, min_days=400, candidates=None, exclude=(),
-               start=None, end=None) -> dict:
+               start=None, end=None, positions=None, extra_db=None) -> dict:
     """Layer 1: returns matrix, the current allocation, and how much of it the
-    universe covers."""
+    universe covers.
+
+    `positions` (ticker -> shares) replaces the trades table as the definition
+    of what is held, for when the database is behind the real account. The
+    allocation is then each position's shares at its latest price. Without it
+    the result is exactly what it always was.
+    """
+    held = None
+    if positions is not None:
+        positions = normalize_positions(positions)
+        held = [t for t, _ in positions]
     d = load_returns(db_path, min_days=min_days, extra=candidates,
-                     exclude=exclude, start=start, end=end)
-    alloc = current_allocation(db_path)
+                     exclude=exclude, start=start, end=end, held=held,
+                     extra_db=extra_db)
+    # In trades mode the table is valued from the database alone, matching
+    # current_allocation; the cache only prices positions entered by hand.
+    table = position_table(db_path, positions,
+                           extra_db if positions is not None else None)
+    if positions is None:
+        alloc = current_allocation(db_path)
+        value = float(portfolio_value(db_path))
+    else:
+        priced = table[table["value"] > 0]       # NaN (unpriced) compares False
+        value = float(priced["value"].sum())
+        alloc = (priced.set_index("ticker")["value"] / value if value > 0
+                 else pd.Series(dtype=float))
     covered = sum(alloc.get(t, 0.0) for t in d["universe"])
     return {"data": d, "allocation": alloc, "covered": covered,
-            "portfolio_value": float(portfolio_value(db_path))}
+            "portfolio_value": value, "positions": table}
 
 
 def stage_statistics(rets: pd.DataFrame) -> dict:
@@ -702,7 +890,7 @@ def pipeline(cfg: PipelineConfig | None = None) -> dict:
     `t_df` (the df actually used), `estimates`, `allocation` and `config`."""
     cfg = cfg if cfg is not None else PipelineConfig()
     s1 = stage_data(cfg.db_path, cfg.min_days, cfg.candidates, cfg.exclude,
-                    cfg.start, cfg.end)
+                    cfg.start, cfg.end, cfg.positions, cfg.extra_db)
     d, alloc, covered = s1["data"], s1["allocation"], s1["covered"]
     tickers = d["universe"]
 
@@ -716,7 +904,9 @@ def pipeline(cfg: PipelineConfig | None = None) -> dict:
     # is anchored to the real money at stake rather than a round number.
     wealth = cfg.wealth if cfg.wealth is not None else s1["portfolio_value"]
     if not wealth > 0:
-        raise ValueError("The database shows no open positions with a price, "
+        source = ("The database shows" if cfg.positions is None
+                  else "The positions given include")
+        raise ValueError(f"{source} no open positions with a price, "
                          "so there is no wealth to anchor the utility scale. "
                          "Pass wealth explicitly.")
     # Default risk tolerance is a quarter of wealth. R is measured in dollars:
@@ -745,7 +935,7 @@ def pipeline(cfg: PipelineConfig | None = None) -> dict:
         "tail_study": s5["tail_study"],
         "tickers": tickers, "wealth": wealth, "R": R, "median_t_df": med_df,
         "t_df": t_df, "estimates": cfg.estimates, "allocation": alloc,
-        "config": asdict(cfg),
+        "positions": s1["positions"], "config": asdict(cfg),
     }
 
 
@@ -779,8 +969,13 @@ def print_report(out: dict, file=None) -> None:
             + ", ".join(f"{t}({n})" for t, n in sorted(d["excluded"].items())))
     if d.get("user_excluded"):
         say(f"  removed by choice {', '.join(sorted(d['user_excluded']))}")
+    if d.get("fetched"):
+        say(f"  fetched prices    {', '.join(d['fetched'])}  (research price "
+            f"cache, not the portfolio database)")
     say(f"  current portfolio {len(out['allocation'])} positions; "
-        f"{covered:.1%} of its value is modellable")
+        f"{covered:.1%} of its value is modellable"
+        + ("  (positions as entered, not from trades)"
+           if cfg.get("positions") is not None else ""))
 
     # ---- Layer 2 --------------------------------------------------------
     say(f"\nLAYER 2 — STATISTICS")
@@ -892,9 +1087,30 @@ def main():
     ap.add_argument("--wealth", type=float, default=None)
     ap.add_argument("--paths", type=int, default=100_000)
     ap.add_argument("--no-charts", action="store_true")
+    ap.add_argument("--add", default="",
+                    help="extra candidate tickers, e.g. 'AAPL,MSFT'. Tickers not "
+                         "in the database are read from the research price "
+                         "cache (fetch them first with market_data.py)")
+    ap.add_argument("--positions", default=None,
+                    help="CSV of ticker,shares to use instead of the trades "
+                         "table as what you hold (the app saves one as "
+                         "data/portfolio_positions.csv)")
     a = ap.parse_args()
 
-    out = run(a.db, wealth=a.wealth, R=a.risk, n_paths=a.paths)
+    if a.add or a.positions:
+        from market_data import CACHE_DB, parse_tickers
+        added, bad = parse_tickers(a.add)
+        if bad:
+            ap.error(f"not ticker symbols: {', '.join(bad)}")
+        cands = CANDIDATE_ETFS + [t for t in added if t not in CANDIDATE_ETFS]
+        out = pipeline(PipelineConfig(
+            db_path=a.db, wealth=a.wealth, R=a.risk, n_paths=a.paths,
+            candidates=tuple(cands) if added else None,
+            positions=read_positions(a.positions) if a.positions else None,
+            extra_db=CACHE_DB))
+        print_report(out)
+    else:
+        out = run(a.db, wealth=a.wealth, R=a.risk, n_paths=a.paths)
     if not a.no_charts:
         from charts import make_all_charts
         make_all_charts(out, RESULTS)

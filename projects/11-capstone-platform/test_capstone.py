@@ -379,6 +379,139 @@ def test_pipeline_interface():
           large["ce"] / 23_526.0, small["ce"] / 100.0, tol=1e-9)
 
 
+def test_positions_and_price_cache():
+    print("\n--- Your positions and the research price cache " + "-" * 27)
+    import sqlite3
+    import tempfile
+    import market_data as md
+
+    # ---- ticker parsing and price cleaning -------------------------------
+    check("tickers are parsed, upper-cased and de-duplicated",
+          md.parse_tickers(" aapl, msft  brk-b;AAPL x$ ^gspc"),
+          (["AAPL", "MSFT", "BRK-B", "^GSPC"], ["X$"]))
+    check("empty input parses to nothing", md.parse_tickers(""), ([], []))
+    check("cleaning drops today's moving bar, bad prices, and sorts",
+          md.clean_closes([("2026-01-03", 11.0), ("2026-01-02", 10.0),
+                           ("2026-01-04", float("nan")), ("2026-01-05", 0.0),
+                           ("2026-01-06", -1.0), ("2026-01-09", 12.0)],
+                          today="2026-01-09"),
+          [("2026-01-02", 10.0), ("2026-01-03", 11.0)])
+
+    # ---- positions -------------------------------------------------------
+    check("positions are normalised: case, duplicates added, zeros dropped",
+          cs.normalize_positions([(" aaa ", 2), ("BBB", 0), ("aaa", 1.5),
+                                  ("CCC", "3")]),
+          (("AAA", 3.5), ("CCC", 3.0)))
+    check("a dict normalises the same way",
+          cs.normalize_positions({"bbb": 1, "AAA": 2}), (("AAA", 2.0), ("BBB", 1.0)))
+    for bad in ([("AAA", -1)], [("AAA", float("nan"))], [("", 1)],
+                [("AAA", "ten")]):
+        try:
+            cs.normalize_positions(bad)
+            ok = False
+        except ValueError:
+            ok = True
+        check_true(f"positions reject {bad}", ok)
+    check("the config stores normalised positions",
+          cs.PipelineConfig(positions={"aaa": 1, "BBB": 0}).positions,
+          (("AAA", 1.0),))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        f = os.path.join(tmp, "p.csv")
+        pos = (("AAA", 1 / 3), ("BBB", 12.345678901234567))
+        cs.write_positions(f, pos)
+        check("positions survive a save and load exactly", cs.read_positions(f), pos)
+
+        # ---- the cache ---------------------------------------------------
+        cache = os.path.join(tmp, "cache.db")
+        check("a missing cache lists nothing", md.cached_tickers(cache), {})
+        db = os.path.join(tmp, "t.db")
+        dates = _tiny_db(db, n_days=60)
+        rng = np.random.default_rng(9)
+        ddd = list(zip(dates, 50 * np.exp(np.cumsum(rng.normal(0, 0.01, 60)))))
+
+        def stub(t):
+            if t == "BOOM":
+                raise ConnectionError("network down")
+            return {"DDD": ddd, "AAA": [(d, 1.0 + i) for i, d in enumerate(dates)]
+                    }.get(t, [])
+
+        res = md.fetch(["DDD", "BOOM", "NOPE", "AAA"], cache, source=stub,
+                       today="2099-01-01")
+        check("fetch stores what it finds", res["stored"], {"DDD": 60, "AAA": 60})
+        check("an unknown symbol is reported missing", res["missing"], ["NOPE"])
+        check_true("one failing ticker does not lose the others",
+                   list(res["errors"]) == ["BOOM"] and "network down" in res["errors"]["BOOM"])
+        md.fetch(["DDD"], cache, source=lambda t: ddd[:30], today="2099-01-01")
+        n = sqlite3.connect(cache).execute(
+            "SELECT COUNT(*) FROM prices WHERE ticker='DDD'").fetchone()[0]
+        check("a re-fetch replaces the history rather than appending", n, 30)
+        check("the cache records each fetch", md.cached_tickers(cache)["DDD"]["n_rows"], 30)
+        md.fetch(["DDD"], cache, source=lambda t: ddd, today="2099-01-01")
+
+        # ---- load_returns with a second source ---------------------------
+        base = cs.load_returns(db, min_days=20, extra=[])
+        d = cs.load_returns(db, min_days=20, extra=["DDD"], extra_db=cache)
+        check("a cached ticker joins the universe",
+              d["universe"], ["AAA", "BBB", "CCC", "DDD"])
+        check("and is reported as fetched", d["fetched"], ["DDD"])
+        check_true("the database wins for a ticker it already prices",
+                   np.array_equal(d["returns"]["AAA"].values,
+                                  base["returns"]["AAA"].values))
+        check("without the cache the added ticker is a 0-day exclusion",
+              cs.load_returns(db, min_days=20, extra=["DDD"])["excluded"], {"DDD": 0})
+        d = cs.load_returns(db, min_days=20, extra=[], held=["CCC", "AAA"],
+                            extra_db=cache)
+        check("held can be given instead of read from trades",
+              (d["held"], d["universe"]), (["AAA", "CCC"], ["AAA", "CCC"]))
+        try:
+            cs.load_returns(db, min_days=20, extra=["AAA"], exclude=["BBB", "CCC"])
+            raised = ""
+        except cs.InsufficientDataError as e:
+            raised = str(e)
+        check_true("a ticker both held and a candidate counts once",
+                   "Found 1 of 3" in raised, raised.strip().splitlines()[0]
+                   if raised else "no error: one asset passed as two")
+
+        # ---- valuing positions -------------------------------------------
+        last = {t: c for t, _, c in sqlite3.connect(db).execute(
+            "SELECT ticker, MAX(date), close FROM prices GROUP BY ticker")}
+        pt = cs.position_table(db, {"AAA": 2, "DDD": 4, "ZZZ": 1}, cache)
+        pt = pt.set_index("ticker")
+        check("a database ticker is priced from the database",
+              (pt.loc["AAA", "source"], pt.loc["AAA", "value"]),
+              ("database", 2 * last["AAA"]))
+        check("a cached ticker is priced from the cache",
+              (pt.loc["DDD", "source"], pt.loc["DDD", "value"]),
+              ("fetched", 4 * ddd[-1][1]))
+        check_true("an unpriced position is NaN, not zero",
+                   pt.loc["ZZZ", "source"] == "no price"
+                   and np.isnan(pt.loc["ZZZ", "value"]))
+
+        s1 = cs.stage_data(db, 20, [], (), None, None,
+                           {"AAA": 2, "DDD": 4, "ZZZ": 1}, cache)
+        v = {"AAA": 2 * last["AAA"], "DDD": 4 * ddd[-1][1]}
+        check("portfolio value counts priced positions only",
+              s1["portfolio_value"], sum(v.values()))
+        check("allocation is shares x price over the total",
+              {t: round(w, 12) for t, w in s1["allocation"].items()},
+              {t: round(x / sum(v.values()), 12) for t, x in v.items()})
+        check("an entered position joins the universe as held",
+              s1["data"]["held"], ["AAA", "DDD", "ZZZ"])
+        check("the unpriced one is a reported exclusion",
+              s1["data"]["excluded"], {"ZZZ": 0})
+        trades = cs.stage_data(db, 20, [])
+        same = cs.stage_data(db, 20, [], positions=cs.held_positions(db))
+        check_true("positions equal to the trades give the trades' allocation",
+                   np.allclose(same["allocation"].sort_index().values,
+                               trades["allocation"].sort_index().values,
+                               rtol=0, atol=1e-12)
+                   and abs(same["portfolio_value"] - trades["portfolio_value"]) < 1e-9)
+        empty = cs.stage_data(db, 20, ["AAA", "BBB"], positions={})
+        check_true("no positions means no current portfolio, not a crash",
+                   empty["portfolio_value"] == 0 and empty["allocation"].empty)
+
+
 def test_real_pipeline():
     print("\n--- Real end-to-end pipeline " + "-" * 47)
     if not os.path.exists(cs.DB_PATH):
@@ -441,6 +574,13 @@ def test_real_pipeline():
 
     check("the fitted median df is the df used by default",
           out["t_df"], out["median_t_df"])
+    pos = cs.stage_data(positions=cs.held_positions())
+    check_true("entering the database's own positions changes nothing",
+               pos["data"]["universe"] == out["tickers"]
+               and abs(pos["portfolio_value"] - cs.portfolio_value()) < 1e-6
+               and float((pos["allocation"] - out["allocation"]).abs().max()) < 1e-12)
+    check("the position table lists every open position",
+          list(out["positions"]["ticker"]), cs.held_tickers())
     import io
     buf = io.StringIO()
     cs.print_report(out, file=buf)
@@ -471,6 +611,7 @@ def main():
     test_monte_carlo()
     test_alignment_and_describe()
     test_pipeline_interface()
+    test_positions_and_price_cache()
     if not fast:
         test_real_pipeline()
     print("\n" + "=" * 78)

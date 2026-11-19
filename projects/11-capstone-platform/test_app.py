@@ -15,6 +15,9 @@ Three kinds of check:
     position cap, a database the optimizer cannot use.
 
 Needs the real portfolio database (data/portfolio.db); skipped without it.
+Never touches your own saved positions or price cache, and never goes online:
+both live in a temporary folder for the run, and Yahoo Finance is replaced by
+an offline stub.
 
 Run:
     python test_app.py
@@ -22,14 +25,26 @@ Run:
 from __future__ import annotations
 import json
 import os
+import shutil
+import sqlite3
 import sys
+import tempfile
 import warnings
 
 warnings.filterwarnings("ignore")
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
+# Before market_data is imported anywhere: point the price cache and the saved
+# positions at a scratch folder, so a saved data/portfolio_positions.csv cannot
+# change what the default view shows, and the tests cannot overwrite it.
+SCRATCH = tempfile.mkdtemp(prefix="test_app_")
+os.environ["RESEARCH_PRICES_DB"] = os.path.join(SCRATCH, "research_prices.db")
+os.environ["RESEARCH_POSITIONS_DIR"] = SCRATCH
+
+import numpy as np                                       # noqa: E402
 import capstone as cs                                    # noqa: E402
+import market_data as md                                 # noqa: E402
 
 PASS, FAIL = [], []
 APP = os.path.join(HERE, "app.py")
@@ -79,6 +94,49 @@ def frame_with(at, column):
         if column in v.columns:
             return v
     raise LookupError(f"no dataframe with column {column!r}")
+
+
+def editor_key(at):
+    """Session-state key of the positions editor (it embeds a hash of the
+    table it was opened on)."""
+    keys = [k for k in at.session_state.filtered_state if str(k).startswith("positions_")]
+    if len(keys) != 1:
+        raise LookupError(f"expected one positions editor, found {keys}")
+    return keys[0]
+
+
+def edit_positions(at, edited_rows=None, added_rows=None, deleted_rows=None,
+                   run=True):
+    """Make the edits a user would make in the positions table, and rerun.
+
+    A browser re-sends the editor's edits on every rerun. AppTest does not
+    model the data editor, so it keeps them for one run only: any later run
+    that should still see them calls this again (run=False to combine with
+    another widget change or a button click in the same run).
+    """
+    at.session_state[editor_key(at)] = {
+        "edited_rows": edited_rows or {}, "added_rows": added_rows or [],
+        "deleted_rows": deleted_rows or []}
+    return at.run() if run else at
+
+
+def button(at, prefix):
+    for b in at.button:
+        if b.label.startswith(prefix):
+            return b
+    raise LookupError(f"no button starting {prefix!r}")
+
+
+def stub_closes(ticker):
+    """Offline stand-in for Yahoo: a reproducible random walk on the
+    database's trading days, or nothing for an unknown symbol."""
+    if ticker.startswith("NOPE"):
+        return []
+    days = [r[0] for r in sqlite3.connect(cs.DB_PATH).execute(
+        "SELECT DISTINCT date FROM prices WHERE ticker = 'VOO' ORDER BY date")]
+    rng = np.random.default_rng(sum(map(ord, ticker)))
+    px = 50 * np.exp(np.cumsum(rng.normal(0.0004, 0.015, len(days))))
+    return list(zip(days, px))
 
 
 def clean(at):
@@ -275,6 +333,134 @@ def test_failure_paths():
         print("  (demo-database check skipped — no data/portfolio_demo.db)")
 
 
+def test_tickers_and_positions():
+    print("\n--- Your tickers and your positions " + "-" * 40)
+    md.yahoo_closes = stub_closes          # the app calls md.fetch -> this stub
+    db_pos = cs.normalize_positions(cs.held_positions())
+    pos_file = os.path.join(SCRATCH, "portfolio_positions.csv")
+
+    at = fresh()
+    check_true("the default view uses the database's positions",
+               f"Using the {len(db_pos)} open positions" in texts(at.sidebar.caption)
+               and "positions as entered" not in at.caption[0].value)
+
+    # ---- adding tickers --------------------------------------------------
+    widget(at, "text_input", "Add tickers").set_value("aapl, NOPE1, bad$$, VOO").run()
+    check_true("adding tickers renders cleanly", clean(at))
+    warn = texts(at.sidebar.warning)
+    check_true("a malformed symbol is named and ignored", "BAD$$" in warn, warn)
+    check_true("tickers without prices are named before fetching",
+               "No prices yet for AAPL, NOPE1" in warn, warn)
+    check_true("a ticker already in the universe is said to be",
+               "Already in the universe: VOO" in texts(at.sidebar.caption))
+    check_true("nothing is fetched until asked",
+               not os.path.exists(md.CACHE_DB))
+    button(at, "Fetch prices").click().run()
+    check_true("fetching renders cleanly", clean(at),
+               f"{[e.value[:200] for e in at.exception]}")
+    check_true("the fetch reports what it stored",
+               "Fetched AAPL" in texts(at.sidebar.success))
+    check_true("an unknown symbol is reported, not fatal",
+               "No prices found for NOPE1" in texts(at.sidebar.warning))
+    check_true("the caption counts only added tickers that made it in",
+               "· 21 assets ·" in at.caption[0].value
+               and "· +1 added" in at.caption[0].value, at.caption[0].value)
+    uni = frame_with(at, "Prices from").set_index("Ticker")
+    check("the added ticker's role and price source",
+          (uni.loc["AAPL", "Role"], uni.loc["AAPL", "Prices from"]),
+          ("added", "research cache"))
+    check_true("an added ticker is never the published configuration",
+               "the published configuration" not in at.caption[0].value)
+    code = texts(at.code)
+    check_true("the reproduce snippet carries the added ticker and the cache",
+               "candidates=(*cs.CANDIDATE_ETFS, 'AAPL', 'NOPE1')" in code
+               and "extra_db=" in code, code[:200])
+    s1 = cs.stage_data(candidates=cs.CANDIDATE_ETFS + ["AAPL"], extra_db=md.CACHE_DB)
+    check("the app's universe equals the stage called directly",
+          list(frame_with(at, "Prices from")["Ticker"]), s1["data"]["universe"])
+    check_true("the portfolio database was not written to",
+               "AAPL" not in cs.held_tickers() and sqlite3.connect(cs.DB_PATH).execute(
+                   "SELECT COUNT(*) FROM prices WHERE ticker='AAPL'").fetchone()[0] == 0)
+
+    # ---- editing positions -------------------------------------------------
+    at = fresh()
+    base_ret = metric(at, "Expected return").value
+    base_vol_delta = metric(at, "Volatility").delta
+    big = max(range(len(db_pos)), key=lambda i: db_pos[i][1])
+    tripled = {big: {"Shares": db_pos[big][1] * 3}}
+    edit_positions(at, edited_rows=tripled)
+    check_true("an edited share count renders cleanly", clean(at))
+    check_true("the caption says positions are as entered",
+               "positions as entered" in at.caption[0].value)
+    check_true("the sidebar says the edits are not saved",
+               "edited, not saved" in texts(at.sidebar.caption))
+    check("the recommendation does not depend on what you hold",
+          metric(at, "Expected return").value, base_ret)
+    check_true("the current-portfolio comparison does",
+               metric(at, "Volatility").delta != base_vol_delta,
+               f"{base_vol_delta} -> {metric(at, 'Volatility').delta}")
+    want = dict(db_pos)
+    want[db_pos[big][0]] *= 3
+    s1 = cs.stage_data(positions=want)
+    shown = frame_with(at, "Weight %").set_index("Ticker")["Weight %"]
+    check_true("current weights equal shares x price, computed independently",
+               all(abs(shown[t] - w * 100) < 1e-9 for t, w in s1["allocation"].items()))
+    check_true("the indexed view hides share counts and prices",
+               "Shares" not in frame_with(at, "Weight %").columns
+               and "Price" not in frame_with(at, "Weight %").columns)
+    check("indexed values add up to 100",
+          round(float(frame_with(at, "Weight %")["Value"].sum()), 9), 100.0)
+    edit_positions(at, edited_rows=tripled, run=False)
+    widget(at, "radio", "Values").set_value("Dollars").run()
+    table = frame_with(at, "Weight %").set_index("Ticker")
+    # Pass/fail only: these are real share counts, kept out of the test log.
+    check_true("the dollar view shows the edited share count",
+               float(table.loc[db_pos[big][0], "Shares"]) == db_pos[big][1] * 3)
+
+    # ---- save, reload, revert ----------------------------------------------
+    edit_positions(at, edited_rows=tripled, run=False)
+    button(at, "Save").click().run()
+    check_true("Save writes the positions file", os.path.exists(pos_file))
+    check_true("the saved file holds exactly the edited positions",
+               cs.read_positions(pos_file) == cs.normalize_positions(want))
+    at = fresh()
+    check_true("saved positions are used on the next visit",
+               "positions as entered" in at.caption[0].value
+               and "(saved file)" in texts(at.sidebar.caption),
+               texts(at.sidebar.caption)[-160:])
+    check_true("the reproduce snippet reads the saved file",
+               "positions=cs.read_positions(" in texts(at.code))
+    button(at, "Use database").click().run()
+    check_true("Use database deletes the file and goes back to the trades",
+               not os.path.exists(pos_file)
+               and "positions as entered" not in at.caption[0].value)
+
+    # ---- a position the database does not know -----------------------------
+    at = fresh()
+    edit_positions(at, added_rows=[{"Ticker": "nope2", "Shares": 5.0}])
+    check_true("an unpriced new position renders cleanly", clean(at))
+    check_true("it is named as unpriced and not valued",
+               "No price for NOPE2" in texts(at.warning))
+    check_true("its price can be fetched from the sidebar",
+               "No prices yet for NOPE2" in texts(at.sidebar.warning)
+               and button(at, "Fetch prices") is not None)
+    edit_positions(at, added_rows=[{"Ticker": "aapl", "Shares": 5.0}])
+    check_true("a cached new position joins the current portfolio",
+               clean(at) and "AAPL" in list(frame_with(at, "Weight %")["Ticker"])
+               and frame_with(at, "Prices from").set_index("Ticker")
+               .loc["AAPL", "Role"] == "held")
+    edit_positions(at, added_rows=[{"Ticker": "AAPL", "Shares": -1.0},
+                                   {"Ticker": "two words", "Shares": 1.0}])
+    w = texts(at.sidebar.warning)
+    check_true("bad rows are named, and left out rather than guessed",
+               clean(at) and "negative shares" in w and "'two words'" in w, w)
+    edit_positions(at, deleted_rows=list(range(len(db_pos))))
+    check_true("deleting every position leaves a working recommendation",
+               clean(at) and "Recommended %" in frame_with(at, "Recommended %").columns
+               and "current-vs-recommended comparisons are omitted"
+               in texts(at.warning))
+
+
 def main():
     print("=" * 78)
     print("Week 12 research app test suite")
@@ -292,11 +478,13 @@ def main():
             test_published_configuration()
             test_controls()
             test_failure_paths()
+            test_tickers_and_positions()
     print("\n" + "=" * 78)
     print(f"{len(PASS)} passed, {len(FAIL)} failed")
     for f in FAIL:
         print("  FAILED:", f)
     print("=" * 78)
+    shutil.rmtree(SCRATCH, ignore_errors=True)
     return 1 if FAIL else 0
 
 

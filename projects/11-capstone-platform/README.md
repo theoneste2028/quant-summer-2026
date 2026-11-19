@@ -60,10 +60,12 @@ return. Both earn their place through low correlation.
 python projects/11-capstone-platform/capstone.py              # full pipeline + charts
 python projects/11-capstone-platform/capstone.py --risk 5000  # a different risk tolerance
 python projects/11-capstone-platform/export_results.py        # JSON for the site
-python projects/11-capstone-platform/test_capstone.py         # 108 checks
+python projects/11-capstone-platform/test_capstone.py         # 142 checks
 python site/build_page.py                                     # self-contained results page
 streamlit run projects/11-capstone-platform/app.py            # interactive research app
-python projects/11-capstone-platform/test_app.py              # 38 checks on the app
+python projects/11-capstone-platform/test_app.py              # 73 checks on the app
+python projects/11-capstone-platform/market_data.py AAPL MSFT # fetch prices for tickers the DB lacks
+python projects/11-capstone-platform/capstone.py --add AAPL --positions data/portfolio_positions.csv
 ```
 
 By default the utility scale is anchored to the portfolio's real market value.
@@ -91,16 +93,41 @@ and never reloads data or refits distributions; returning to a setting already
 computed is instant. After the ETL appends prices, the next interaction
 recomputes on the new data.
 
+### Your own tickers and positions
+- **Add tickers** (sidebar, Universe) puts names you are considering into the
+  optimizer's universe as candidates.
+- **Positions (shares you hold)** (sidebar, Holdings) starts from the open
+  positions in the trades table. Edit share counts, add positions the database
+  does not have yet, delete ones you have sold. The current portfolio is then
+  each position's shares at its latest close. **Save** writes
+  `data/portfolio_positions.csv` (gitignored) so the edits persist; **Use
+  database** deletes that file and goes back to the trades. A table identical
+  to the trades runs exactly the default pipeline.
+- **Prices.** A ticker the portfolio database has never priced gets its prices
+  from a separate cache, `data/research_prices.db`, filled only when you press
+  **Fetch prices** (about five years of adjusted closes from Yahoo Finance;
+  only the symbols are sent). The database always wins for a ticker it prices,
+  and a ticker is never stitched together from both sources.
+- **The shared window.** Returns use only the dates every asset has, so the
+  analysis ends where the stalest price series ends. If the database is behind,
+  run the ETL first. The app warns when positions are valued at prices from
+  different dates.
+- **Privacy.** In the indexed view, share counts and prices are hidden; switch
+  Values to Dollars to see them.
+
 ## Files
 - `capstone.py` — the five-layer pipeline: one stage function per layer,
   `pipeline()` to run them all, `print_report()` for the CLI output
 - `app.py` — Streamlit research app over the same stages, each cached on its inputs
+- `market_data.py` — the research price cache: fetches adjusted closes for tickers
+  the portfolio database does not hold, into a separate file
 - `robust.py` — Ledoit-Wolf and Bayes-Stein shrinkage, minimum-variance portfolio
 - `charts.py` — frontier, allocation, fan chart, risk sweep
 - `export_results.py` — precomputes the site JSON (values indexed to 100 by default)
-- `test_capstone.py` — 108 checks, including estimators scored against a known covariance
-- `test_app.py` — 38 checks that drive the app headlessly, including that it
-  reproduces `site/capstone.json` at the published settings
+- `test_capstone.py` — 142 checks, including estimators scored against a known covariance
+- `test_app.py` — 73 checks that drive the app headlessly, including that it
+  reproduces `site/capstone.json` at the published settings, and the
+  tickers/positions flow end to end (offline, in a scratch folder)
 - `WEEK11_SUMMARY.md` — the full writeup
 
 ## What I learned
