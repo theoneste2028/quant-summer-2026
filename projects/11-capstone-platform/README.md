@@ -60,8 +60,10 @@ return. Both earn their place through low correlation.
 python projects/11-capstone-platform/capstone.py              # full pipeline + charts
 python projects/11-capstone-platform/capstone.py --risk 5000  # a different risk tolerance
 python projects/11-capstone-platform/export_results.py        # JSON for the site
-python projects/11-capstone-platform/test_capstone.py         # 78 checks
+python projects/11-capstone-platform/test_capstone.py         # 108 checks
 python site/build_page.py                                     # self-contained results page
+streamlit run projects/11-capstone-platform/app.py            # interactive research app
+python projects/11-capstone-platform/test_app.py              # 38 checks on the app
 ```
 
 By default the utility scale is anchored to the portfolio's real market value.
@@ -74,12 +76,31 @@ account values:
 python projects/11-capstone-platform/capstone.py --wealth 100
 ```
 
+## Research app
+`app.py` puts every input of the pipeline on a control — risk tolerance,
+position cap, shrunk vs raw estimates, the asset universe, a date window, the
+tail model, paths and seed — and shows the recommendation, frontier, risk sweep,
+simulations, statistics and data behind them. It calls the same stage functions
+as the CLI, so it cannot disagree with it: at the default controls with 100,000
+paths it prints the published numbers exactly, and the tests check that.
+
+Each stage is cached on exactly the inputs it depends on, plus the database
+file's modification time. Moving the risk slider re-runs only the decision
+and the simulations — about 5 seconds at 10,000 paths, most of it simulation —
+and never reloads data or refits distributions; returning to a setting already
+computed is instant. After the ETL appends prices, the next interaction
+recomputes on the new data.
+
 ## Files
-- `capstone.py` — the five-layer pipeline
+- `capstone.py` — the five-layer pipeline: one stage function per layer,
+  `pipeline()` to run them all, `print_report()` for the CLI output
+- `app.py` — Streamlit research app over the same stages, each cached on its inputs
 - `robust.py` — Ledoit-Wolf and Bayes-Stein shrinkage, minimum-variance portfolio
 - `charts.py` — frontier, allocation, fan chart, risk sweep
 - `export_results.py` — precomputes the site JSON (values indexed to 100 by default)
-- `test_capstone.py` — 78 checks, including estimators scored against a known covariance
+- `test_capstone.py` — 108 checks, including estimators scored against a known covariance
+- `test_app.py` — 38 checks that drive the app headlessly, including that it
+  reproduces `site/capstone.json` at the published settings
 - `WEEK11_SUMMARY.md` — the full writeup
 
 ## What I learned

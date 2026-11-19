@@ -274,6 +274,111 @@ def test_alignment_and_describe():
     check("describe reports the largest holding first", d["top"][0][0], "T0")
 
 
+def _tiny_db(path, n_days=60, tickers=("AAA", "BBB", "CCC"), late=None):
+    """A minimal portfolio database: holds every ticker, `n_days` of prices.
+    `late` = {ticker: first_day_index} starts some tickers' history later."""
+    import sqlite3
+    late = late or {}
+    con = sqlite3.connect(path)
+    con.executescript("""
+        CREATE TABLE trades (trade_id INTEGER PRIMARY KEY, ticker TEXT, side TEXT,
+                             quantity REAL, price REAL, trade_date TEXT);
+        CREATE TABLE prices (ticker TEXT, date TEXT, close REAL);""")
+    rng = np.random.default_rng(5)
+    dates = pd.bdate_range("2025-01-01", periods=n_days).strftime("%Y-%m-%d")
+    for t in tickers:
+        con.execute("INSERT INTO trades (ticker, side, quantity, price, trade_date) "
+                    "VALUES (?, 'BUY', 10, 100, '2025-01-01')", (t,))
+        px = 100 * np.exp(np.cumsum(rng.normal(0, 0.01, n_days)))
+        for i, (d, p) in enumerate(zip(dates, px)):
+            if i >= late.get(t, 0):
+                con.execute("INSERT INTO prices VALUES (?, ?, ?)", (t, d, float(p)))
+    con.commit(); con.close()
+    return list(dates)
+
+
+def test_pipeline_interface():
+    print("\n--- Pipeline interface (config, stages, errors) " + "-" * 28)
+    import tempfile
+
+    cfg = cs.PipelineConfig()
+    check("config default: position cap", cfg.max_weight, 0.25)
+    check("config default: risk fraction", cfg.risk_fraction, 0.25)
+    check("config default: seed", cfg.seed, 7)
+    check("config default: minimum history", cfg.min_days, 400)
+    check("config default: shrunk estimates", cfg.estimates, "robust")
+    check("sweep defaults are unchanged",
+          list(cs.SWEEP_FRACTIONS), [0.02, 0.05, 0.10, 0.20, 0.30, 0.50, 1.00, 4.00])
+    for bad in [dict(estimates="other"), dict(max_weight=0.0), dict(max_weight=1.5),
+                dict(t_df=2.0), dict(risk_fraction=0.0), dict(n_paths=1)]:
+        try:
+            cs.PipelineConfig(**bad)
+            ok = False
+        except ValueError:
+            ok = True
+        check_true(f"config rejects {bad}", ok)
+
+    check_true("InsufficientDataError is a SystemExit (CLI behaviour kept)",
+               issubclass(cs.InsufficientDataError, SystemExit))
+
+    with tempfile.TemporaryDirectory() as tmp:
+        db = os.path.join(tmp, "t.db")
+        dates = _tiny_db(db, n_days=60, late={"CCC": 30})
+        d = cs.load_returns(db, min_days=20, extra=[])
+        check("all three tickers qualify", d["universe"], ["AAA", "BBB", "CCC"])
+        check("intersection starts when the youngest ticker does",
+              d["start"], dates[31])
+        d = cs.load_returns(db, min_days=20, extra=[], exclude=["CCC"])
+        check("exclude removes the ticker", d["universe"], ["AAA", "BBB"])
+        check("exclude is reported separately", d["user_excluded"], ["CCC"])
+        check_true("excluding the late ticker lengthens the history",
+                   d["start"] == dates[1], d["start"])
+        check("an excluded ticker is not a short-history exclusion",
+              d["excluded"], {})
+        d = cs.load_returns(db, min_days=10, extra=[], start=dates[40])
+        check("a window start is honoured", d["start"], dates[41])
+        check("a window end is honoured",
+              cs.load_returns(db, min_days=10, extra=[], end=dates[49])["end"],
+              dates[49])
+        try:
+            cs.load_returns(db, min_days=20, extra=[], start=dates[45])
+            raised = ""
+        except cs.InsufficientDataError as e:
+            raised = str(e)
+        check_true("history is counted inside the window",
+                   "date window" in raised and "Found 0 of 3" in raised,
+                   raised.strip().splitlines()[0] if raised else "no error")
+        check("held_tickers lists the open positions", cs.held_tickers(db),
+              ["AAA", "BBB", "CCC"])
+
+    _, mu_d, cov_d = synthetic_market(n_assets=4)
+    mu, cov = mu_d * cs.TRADING_DAYS, cov_d * cs.TRADING_DAYS
+    m = {"tickers": ["A", "B", "C", "D"], "mu": mu, "cov": cov,
+         "mu_naive": mu * 2, "cov_naive": cov * 1.5}
+    try:
+        cs.stage_optimize(m, max_weight=0.2)
+        msg = ""
+    except ValueError as e:
+        msg = str(e)
+    check_true("an unreachable cap raises a clear error",
+               "cannot be met with 4 assets" in msg, msg)
+    naive = cs.stage_optimize(m, max_weight=None, estimates="naive")
+    check_true("raw estimates drive the frontier when chosen",
+               naive["mu"] is m["mu_naive"] and naive["cov"] is m["cov_naive"])
+    uncapped = cs.stage_optimize(m, max_weight=None)
+    check_true("no cap lets one position exceed 25%",
+               max(w.max() for w in uncapped["frontier"]["weights"]) > 0.25)
+
+    # The app shows values indexed to 100. That is only honest if the decision
+    # depends on R as a fraction of wealth, not on wealth itself.
+    fr = cs.efficient_frontier(mu, cov, gammas=np.logspace(-1, 2, 12))
+    small = cs.choose_portfolio(fr, mu, cov, 100.0, 25.0, seed=1, t_df=4.0)
+    large = cs.choose_portfolio(fr, mu, cov, 23_526.0, 0.25 * 23_526.0, seed=1, t_df=4.0)
+    check("the choice is scale-invariant in wealth", small["gamma"], large["gamma"])
+    check("certainty equivalents scale with wealth",
+          large["ce"] / 23_526.0, small["ce"] / 100.0, tol=1e-9)
+
+
 def test_real_pipeline():
     print("\n--- Real end-to-end pipeline " + "-" * 47)
     if not os.path.exists(cs.DB_PATH):
@@ -334,6 +439,16 @@ def test_real_pipeline():
                sweep["vol"].max() / sweep["vol"].min() > 2,
                f"{sweep['vol'].min():.3f}..{sweep['vol'].max():.3f}")
 
+    check("the fitted median df is the df used by default",
+          out["t_df"], out["median_t_df"])
+    import io
+    buf = io.StringIO()
+    cs.print_report(out, file=buf)
+    report = buf.getvalue()
+    check_true("the report covers every layer and the comparison",
+               all(h in report for h in ("LAYER 1", "LAYER 2", "LAYER 3", "LAYER 4",
+                                         "LAYER 5", "RECOMMENDED vs ACTUAL")))
+
     tail = out["tail_study"]
     check_true("fat tails hurt most at the shortest horizon",
                tail.iloc[0]["ratio"] >= tail.iloc[-1]["ratio"],
@@ -355,6 +470,7 @@ def main():
     test_certainty_equivalent_layer()
     test_monte_carlo()
     test_alignment_and_describe()
+    test_pipeline_interface()
     if not fast:
         test_real_pipeline()
     print("\n" + "=" * 78)

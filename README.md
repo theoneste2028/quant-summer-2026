@@ -3,15 +3,17 @@
 A 12-week quantitative finance platform built to consolidate three Northwestern
 courses, ending in a portfolio optimizer that runs on a real brokerage history.
 
-**Status:** complete — all 12 weeks · **603 tests across 11 suites, all passing**
+**Status:** complete — all 12 weeks · **671 tests across 12 suites, all passing**
 (`python run_all_tests.py`)
 
 📊 **[Live results page](site/capstone.html)** — self-contained, no build step.
+🔬 **[Research app](#explore-interactively)** — the same pipeline with every input on a slider.
 
 ## Contents
 
 - [Course map](#course-map)
 - [The capstone](#the-capstone)
+- [Research app](#research-app)
 - [Projects](#projects)
 - [Writeups and docs](#writeups-and-docs)
 - [Getting started](#getting-started)
@@ -63,6 +65,27 @@ simulation):
 | P(loss > 10%) | 32.0% | 9.8% | about a third as likely |
 | Expected return | 42.3% | 25.2% | −17 points |
 
+## Research app
+
+`app.py` is a Streamlit front end to the capstone pipeline. Every number comes
+from the same functions the command line uses; the app only chooses inputs,
+caches results, and draws them.
+
+- **Controls:** risk tolerance, position cap, shrunk vs raw estimates, which
+  assets are allowed, a date window, the fat-tail model, simulation paths and
+  seed.
+- **Views:** current vs recommended, the efficient frontier, how the answer
+  moves with risk tolerance, one-year simulations under normal and fat-tailed
+  shocks, per-asset statistics, and exactly what data went in.
+- **Live on the database, not a market feed:** it recomputes when the SQLite
+  file changes, so after the daily ETL run the next interaction uses the new
+  prices.
+- **Reproducible:** at the default controls with 100,000 paths it shows the
+  published numbers exactly, and its Data tab prints the code to reproduce any
+  other configuration from the command line.
+- **Private by default:** values are indexed to 100 unless you switch to
+  dollars, and it makes no network calls.
+
 ## Projects
 
 | # | Project | Key result |
@@ -76,7 +99,7 @@ simulation):
 | 08 | [Query optimization study](projects/08-query-optimization) | 10.0× speed-up on 2.96M rows — and one query where indexes bought only 1.4× |
 | 09 | [Capital budgeting](projects/09-capital-budgeting) | Detects multiple IRRs (25% and 400%); break-even at −31.5% production |
 | 10 | [Decision analysis](projects/10-decision-analysis) | EVPI $355,500 caps study value; real seismic survey worth $214,750 |
-| 11–12 | [Capstone platform](projects/11-capstone-platform) | Shrinkage cuts covariance conditioning 23×; Sharpe 0.64 → 1.00 |
+| 11–12 | [Capstone platform](projects/11-capstone-platform) | Shrinkage cuts covariance conditioning 23×; Sharpe 0.64 → 1.00; interactive research app |
 
 Each project folder holds its code, tests, `results/`, and a weekly summary.
 
@@ -122,10 +145,17 @@ python projects/05-portfolio-database/build_db.py --demo   # offline sample DB
 python projects/08-query-optimization/load_taxi.py         # public NYC taxi data
 ```
 
+### Explore interactively
+
+```bash
+streamlit run projects/11-capstone-platform/app.py         # opens in your browser
+```
+
 ### Test
 
 ```bash
-python run_all_tests.py                                    # all 603 checks, ~30 s
+python run_all_tests.py                                    # all 671 checks, ~95 s
+python run_all_tests.py --fast                             # skip the slow suites
 ```
 
 ## Repository layout
@@ -134,6 +164,7 @@ python run_all_tests.py                                    # all 603 checks, ~30
 projects/          One folder per project: code, tests, results, weekly summary
 writeups/          Long-form writeup per phase + presentation notes
 site/              JSON export + self-contained results page
+                   (the interactive app is projects/11-capstone-platform/app.py)
 docs/              Original plan and user manual (with its build scripts)
 data/              Databases and market data (gitignored — contains real trades)
 run_all_tests.py   Runs every test suite and prints a summary

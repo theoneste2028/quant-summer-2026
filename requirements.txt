@@ -15,6 +15,9 @@ numpy-financial
 # Week 11: convex optimization
 cvxpy
 
+# Week 12: the interactive research app (altair comes with streamlit)
+streamlit>=1.45
+
 # Week 7: MongoDB. pymongo talks to a real server; mongomock stands in when
 # none is running, so the SQL/NoSQL comparison is reproducible offline.
 pymongo

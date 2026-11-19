@@ -318,7 +318,7 @@ const TOC_ENTRIES = [
   ["7.2", "Why the historical averages are deliberately distorted", 2],
   ["7.3", "Why it asks for your risk tolerance", 2],
   ["7.4", "Why risk is reported two different ways", 2],
-  ["7.5", "Why there are 603 automated tests", 2],
+  ["7.5", "Why there are 671 automated tests", 2],
   ["8.", "When something goes wrong", 1],
   ["8.1", "Starting over", 2],
   ["9.", "Glossary", 1],
@@ -514,12 +514,12 @@ const part3 = [
 
   SPACER(140),
 
-  P("This runs every automated check in the project — 603 of them — and takes about 30 seconds. You should see a summary table ending like this:"),
+  P("This runs every automated check in the project — 671 of them — and takes about 95 seconds. You should see a summary table ending like this:"),
 
   CODE([
-    "W11 capstone                       OK       78       0      11.8",
+    "W12 research app                   OK       38       0      67.3",
     "------------------------------------------------------------------",
-    "TOTAL                                      603       0      26.6",
+    "TOTAL                                      671       0      94.9",
   ], { fill: OKBG, accent: "3F7A5E" }),
 
   SPACER(140),
@@ -890,7 +890,7 @@ const part7 = [
     "This simulation assumes each day is independent of the last, so it does not model that clustering at all, and therefore understates long-horizon risk. That limitation is stated in the tool’s own output rather than hidden.",
   ], "warn"),
 
-  H2("7.5 Why there are 603 automated tests"),
+  H2("7.5 Why there are 671 automated tests"),
 
   P("Financial code is unusually dangerous because its mistakes look plausible. A program that adds up money wrongly does not crash — it prints a slightly different number, and nothing tells you which one is right."),
 

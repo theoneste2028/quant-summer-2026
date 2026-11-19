@@ -33,6 +33,14 @@ a real portfolio.
 Run:
     python capstone.py                 # full pipeline, writes results/
     python capstone.py --risk 250000   # a different risk tolerance
+
+Structure:
+    The computation is split into stage functions (stage_data, stage_statistics,
+    stage_optimize, stage_decide, stage_simulate) that `pipeline()` composes and
+    `print_report()` describes. The CLI and `export_results.py` go through
+    `run()`, which is `pipeline()` + `print_report()`; the research app
+    (`app.py`) calls the stages directly so it can cache each one and recompute
+    only what a changed control actually affects.
 """
 from __future__ import annotations
 import os, sys, json, sqlite3, argparse
@@ -61,29 +69,75 @@ TRADING_DAYS = 252
 CANDIDATE_ETFS = ["VOO", "QQQM", "VXUS", "SCHD", "XLK", "VTI", "BND", "GLD",
                   "SMH", "ITA", "FDVV"]
 
+# What the recommendation can be built on: shrunk estimates (the default and
+# the published result) or raw sample estimates (to see the failure directly).
+ESTIMATES = ("robust", "naive")
+
+# Risk tolerances, as fractions of wealth, that the sweep reports by default.
+SWEEP_FRACTIONS = (0.02, 0.05, 0.10, 0.20, 0.30, 0.50, 1.00, 4.00)
+
+
+class InsufficientDataError(SystemExit):
+    """Too little price history to run the optimizer.
+
+    A SystemExit subclass so the CLI behaves exactly as before (the message is
+    printed and the process exits non-zero), while the research app can catch
+    this one case specifically and show the explanation instead of crashing.
+    """
+
 
 # ===========================================================================
 # LAYER 1 — Data (CS 217)
 # ===========================================================================
-def load_returns(db_path=DB_PATH, min_days=400, extra=None) -> dict:
+def _held(con) -> list[str]:
+    """Tickers with a positive net share count, alphabetically."""
+    return [r[0] for r in con.execute("""
+        SELECT ticker FROM trades GROUP BY ticker
+        HAVING SUM(CASE side WHEN 'BUY' THEN quantity ELSE -quantity END) > 1e-9
+        ORDER BY ticker""")]
+
+
+def held_tickers(db_path=DB_PATH) -> list[str]:
+    """The currently-held tickers — the same list `load_returns` starts from."""
+    con = sqlite3.connect(db_path)
+    try:
+        return _held(con)
+    finally:
+        con.close()
+
+
+def load_returns(db_path=DB_PATH, min_days=400, extra=None, exclude=(),
+                 start=None, end=None) -> dict:
     """Build a returns matrix from the SQLite prices table.
 
     Universe = currently-held positions with enough price history, plus the
     broad candidate ETFs. Holdings with short histories are EXCLUDED and
     reported rather than silently dropped, because excluding an asset changes
     what the optimizer is allowed to recommend and the reader deserves to know.
+
+    `exclude` removes tickers by choice (reported separately from the
+    short-history exclusions). `start` / `end` (inclusive, 'YYYY-MM-DD')
+    restrict the date window; history is then counted inside the window, so
+    `min_days` always means "at least this many prices in the data actually
+    used". With the defaults the behaviour is unchanged.
     """
     con = sqlite3.connect(db_path)
-    held = [r[0] for r in con.execute("""
-        SELECT ticker FROM trades GROUP BY ticker
-        HAVING SUM(CASE side WHEN 'BUY' THEN quantity ELSE -quantity END) > 1e-9
-        ORDER BY ticker""")]
-    counts = dict(con.execute(
-        "SELECT ticker, COUNT(*) FROM prices GROUP BY ticker").fetchall())
+    held = _held(con)
+    if start is None and end is None:
+        counts = dict(con.execute(
+            "SELECT ticker, COUNT(*) FROM prices GROUP BY ticker").fetchall())
+    else:
+        counts = dict(con.execute(
+            "SELECT ticker, COUNT(*) FROM prices WHERE date >= ? AND date <= ? "
+            "GROUP BY ticker",
+            (start or "0000-00-00", end or "9999-99-99")).fetchall())
 
     candidates = list(extra if extra is not None else CANDIDATE_ETFS)
-    universe = [t for t in held + candidates if counts.get(t, 0) >= min_days]
-    excluded = {t: counts.get(t, 0) for t in held + candidates
+    exclude = set(exclude)
+    user_excluded = [t for t in held + candidates if t in exclude]
+    pool = [t for t in held + candidates if t not in exclude]
+    universe = [t for t in pool if counts.get(t, 0) >= min_days]
+    excluded = {t: counts.get(t, 0) for t in pool
                 if counts.get(t, 0) < min_days}
 
     # Fail with an explanation rather than an IndexError twenty lines later.
@@ -92,7 +146,7 @@ def load_returns(db_path=DB_PATH, min_days=400, extra=None) -> dict:
     # far too little to estimate a covariance matrix from.
     if len(universe) < 2:
         con.close()
-        raise SystemExit(
+        raise InsufficientDataError(
             f"\nNot enough price history in {os.path.basename(db_path)} to run "
             f"the optimizer.\n"
             f"  Found {len(universe)} of {len(held) + len(candidates)} tickers "
@@ -100,6 +154,12 @@ def load_returns(db_path=DB_PATH, min_days=400, extra=None) -> dict:
             + (f"  Excluded: "
                + ", ".join(f"{t} ({n}d)" for t, n in sorted(excluded.items())[:8])
                + "\n" if excluded else "")
+            + (f"  A date window ({start or 'start'} .. {end or 'end'}) is "
+               f"active: history is counted inside it, so a shorter window or "
+               f"a lower minimum may help.\n"
+               if (start is not None or end is not None) else "")
+            + (f"  Removed by choice: {', '.join(sorted(user_excluded))}\n"
+               if user_excluded else "")
             + "\nThe capstone needs a real brokerage history. Build one with:\n"
               "  python projects/05-portfolio-database/build_db.py "
               "<your_export.csv>\n"
@@ -115,13 +175,29 @@ def load_returns(db_path=DB_PATH, min_days=400, extra=None) -> dict:
     px = (pd.DataFrame(rows, columns=["ticker", "date", "close"])
           .pivot(index="date", columns="ticker", values="close")
           .sort_index())
+    if start is not None:
+        px = px[px.index >= start]
+    if end is not None:
+        px = px[px.index <= end]
     # Intersection of dates: every asset must have a price, or the covariance
     # is being estimated from different periods for different pairs.
     px = px.dropna(how="any")
     rets = np.log(px / px.shift(1)).dropna(how="any")
 
+    # Every asset can pass the per-ticker history check and the intersection
+    # still be too short (histories that barely overlap). Two returns is the
+    # bare minimum for a covariance; anything near it is reported downstream
+    # through obs_per_asset.
+    if len(rets) < 2:
+        raise InsufficientDataError(
+            f"\nThe selected assets share only {len(rets)} day(s) of returns "
+            f"in {os.path.basename(db_path)} — too few to estimate a "
+            f"covariance matrix. Widen the date window or remove the asset "
+            f"with the shortest history.\n")
+
     return {"prices": px, "returns": rets, "universe": list(rets.columns),
             "held": held, "candidates": candidates, "excluded": excluded,
+            "user_excluded": user_excluded,
             "start": str(rets.index[0]), "end": str(rets.index[-1]),
             "n_days": len(rets)}
 
@@ -344,8 +420,7 @@ def risk_tolerance_sweep(frontier, mu, cov, tickers, wealth, t_df=None,
     R is expressed as a fraction of wealth, which makes it comparable across
     portfolio sizes.
     """
-    fractions = fractions if fractions is not None else [
-        0.02, 0.05, 0.10, 0.20, 0.30, 0.50, 1.00, 4.00]
+    fractions = fractions if fractions is not None else list(SWEEP_FRACTIONS)
     rows = []
     for frac in fractions:
         R = wealth * frac
@@ -483,19 +558,217 @@ def describe(w, mu, cov, tickers, top=8) -> dict:
 # ===========================================================================
 # Orchestration
 # ===========================================================================
-def run(db_path=DB_PATH, wealth=None, R=None, seed=7, n_paths=100_000,
-        min_days=400, quiet=False):
+@dataclass(frozen=True)
+class PipelineConfig:
+    """Every input the pipeline takes. The defaults reproduce the CLI exactly."""
+    db_path: str = DB_PATH
+    wealth: float | None = None        # dollars; None -> the portfolio's market value
+    R: float | None = None             # dollars; None -> risk_fraction * wealth
+    risk_fraction: float = 0.25
+    seed: int = 7
+    n_paths: int = 100_000
+    min_days: int = 400
+    max_weight: float | None = 0.25    # None -> no position cap
+    estimates: str = "robust"          # "robust" (shrunk) or "naive" (raw sample)
+    t_df: float | None = None          # None -> median fitted Student-t df
+    candidates: tuple | None = None    # None -> CANDIDATE_ETFS
+    exclude: tuple = ()
+    start: str | None = None           # 'YYYY-MM-DD', inclusive
+    end: str | None = None
+    tail_study: bool = True
+
+    def __post_init__(self):
+        if self.estimates not in ESTIMATES:
+            raise ValueError(f"estimates must be one of {ESTIMATES}, "
+                             f"got {self.estimates!r}")
+        if self.max_weight is not None and not 0 < self.max_weight <= 1:
+            raise ValueError(f"max_weight must be in (0, 1], got {self.max_weight}")
+        if not self.risk_fraction > 0:
+            raise ValueError(f"risk_fraction must be positive, got {self.risk_fraction}")
+        if self.R is not None and not self.R > 0:
+            raise ValueError(f"R must be positive, got {self.R}")
+        if self.wealth is not None and not self.wealth > 0:
+            raise ValueError(f"wealth must be positive, got {self.wealth}")
+        if self.t_df is not None and not self.t_df > 2:
+            raise ValueError(f"t_df must exceed 2 for a finite variance, got {self.t_df}")
+        if self.n_paths < 2:
+            raise ValueError(f"n_paths must be at least 2, got {self.n_paths}")
+        if self.min_days < 2:
+            raise ValueError(f"min_days must be at least 2, got {self.min_days}")
+
+
+def stage_data(db_path=DB_PATH, min_days=400, candidates=None, exclude=(),
+               start=None, end=None) -> dict:
+    """Layer 1: returns matrix, the current allocation, and how much of it the
+    universe covers."""
+    d = load_returns(db_path, min_days=min_days, extra=candidates,
+                     exclude=exclude, start=start, end=end)
+    alloc = current_allocation(db_path)
+    covered = sum(alloc.get(t, 0.0) for t in d["universe"])
+    return {"data": d, "allocation": alloc, "covered": covered,
+            "portfolio_value": float(portfolio_value(db_path))}
+
+
+def stage_statistics(rets: pd.DataFrame) -> dict:
+    """Layer 2: naive and shrunk moments, plus the Week 1 normality fits."""
+    m = estimate_moments(rets)
+    diag = normality_diagnostics(rets)
+    return {"moments": m, "diagnostics": diag,
+            "median_t_df": float(diag["t_df"].median())}
+
+
+def active_moments(moments: dict, estimates="robust"):
+    """The (mu, cov) pair the recommendation is built on."""
+    if estimates == "robust":
+        return moments["mu"], moments["cov"]
+    if estimates == "naive":
+        return moments["mu_naive"], moments["cov_naive"]
+    raise ValueError(f"estimates must be one of {ESTIMATES}, got {estimates!r}")
+
+
+def stage_optimize(moments: dict, max_weight=0.25, estimates="robust") -> dict:
+    """Layer 3: the frontier the decision chooses from, the uncapped naive
+    frontier (always computed, as the reference that shows why shrinkage
+    matters), and the minimum-variance benchmark."""
+    from robust import min_variance_weights
+    tickers = moments["tickers"]
+    mu, cov = active_moments(moments, estimates)
+    # With a cap, sum(w) = 1 is only reachable if n * cap >= 1. Saying so beats
+    # an empty frontier and a KeyError three functions later.
+    if max_weight is not None and max_weight * len(tickers) < 1 - 1e-9:
+        raise ValueError(
+            f"A {max_weight:.0%} position cap cannot be met with "
+            f"{len(tickers)} assets: fully invested needs at least "
+            f"{int(np.ceil(1 / max_weight - 1e-9))}. Raise the cap or "
+            f"include more assets.")
+
+    # The naive frontier is computed only to be shown failing. Markowitz on raw
+    # sample means is an error maximizer: it cannot distinguish a high expected
+    # return from a lucky one, so it concentrates on the noisiest estimates.
+    fr_naive = efficient_frontier(moments["mu_naive"], moments["cov_naive"])
+    fr = efficient_frontier(mu, cov, max_weight=max_weight)
+    if fr.empty:
+        raise RuntimeError("The optimizer found no feasible portfolio on any "
+                           "point of the frontier.")
+
+    # A benchmark that uses NO expected-return estimates at all. If a mean-driven
+    # portfolio cannot beat this, the means were not carrying information.
+    w_mv = min_variance_weights(cov)
+    mv = describe(w_mv, mu, cov, tickers)
+    return {"frontier": fr, "frontier_naive": fr_naive,
+            "min_variance": {"weights": w_mv, **mv},
+            "mu": mu, "cov": cov, "estimates": estimates,
+            "max_weight": max_weight}
+
+
+def stage_decide(opt: dict, tickers, wealth, R, t_df, seed, alloc,
+                 sweep_fractions=None) -> dict:
+    """Layer 4: the certainty-equivalent choice, the risk-tolerance sweep, and
+    the current portfolio scored on the same scale."""
+    fr, mu, cov = opt["frontier"], opt["mu"], opt["cov"]
+    ch = choose_portfolio(fr, mu, cov, wealth, R, t_df=t_df, seed=seed)
+    w_rec = ch["weights"]
+    rec = describe(w_rec, mu, cov, tickers)
+    sweep = risk_tolerance_sweep(
+        fr, mu, cov, tickers, wealth, t_df=t_df, seed=seed,
+        fractions=list(sweep_fractions) if sweep_fractions is not None else None)
+    w_cur = align_weights(alloc, tickers)
+    cur = describe(w_cur, mu, cov, tickers)
+    ce_cur = portfolio_certainty_equivalent(w_cur, mu, cov, wealth, R,
+                                            seed=seed, t_df=t_df)
+    return {"frontier": ch["frontier"],
+            "recommended": {"weights": w_rec, "gamma": ch["gamma"],
+                            "ce": ch["ce"], **rec},
+            "current": {"weights": w_cur, "ce": ce_cur, **cur},
+            "sweep": sweep}
+
+
+def stage_simulate(w_rec, w_cur, mu, cov, t_df, n_paths, seed,
+                   tail_study=True) -> dict:
+    """Layer 5: one year forward for the recommendation (normal and fat-tailed)
+    and the current portfolio (fat-tailed), plus the horizon tail study."""
+    mc_n = simulate_forward(w_rec, mu, cov, n_paths=n_paths, seed=seed)
+    mc_t = simulate_forward(w_rec, mu, cov, n_paths=n_paths, seed=seed, t_df=t_df)
+    mc_cur = simulate_forward(w_cur, mu, cov, n_paths=n_paths, seed=seed, t_df=t_df)
+    tail = (horizon_tail_study(w_rec, mu, cov, t_df,
+                               n_paths=min(n_paths, 100_000), seed=seed)
+            if tail_study else None)
+    return {"mc_normal": mc_n, "mc_t": mc_t, "mc_current": mc_cur,
+            "tail_study": tail}
+
+
+def pipeline(cfg: PipelineConfig | None = None) -> dict:
+    """All five layers, no printing. Returns everything `run()` always has, plus
+    `t_df` (the df actually used), `estimates`, `allocation` and `config`."""
+    cfg = cfg if cfg is not None else PipelineConfig()
+    s1 = stage_data(cfg.db_path, cfg.min_days, cfg.candidates, cfg.exclude,
+                    cfg.start, cfg.end)
+    d, alloc, covered = s1["data"], s1["allocation"], s1["covered"]
+    tickers = d["universe"]
+
+    s2 = stage_statistics(d["returns"])
+    m, med_df = s2["moments"], s2["median_t_df"]
+    t_df = cfg.t_df if cfg.t_df is not None else med_df
+
+    s3 = stage_optimize(m, cfg.max_weight, cfg.estimates)
+
+    # Default wealth is the portfolio's own market value, so the utility scale
+    # is anchored to the real money at stake rather than a round number.
+    wealth = cfg.wealth if cfg.wealth is not None else s1["portfolio_value"]
+    if not wealth > 0:
+        raise ValueError("The database shows no open positions with a price, "
+                         "so there is no wealth to anchor the utility scale. "
+                         "Pass wealth explicitly.")
+    # Default risk tolerance is a quarter of wealth. R is measured in dollars:
+    # setting R equal to wealth means being willing to stake essentially the
+    # whole portfolio on a coin flip, which is not what most people mean by
+    # "moderately aggressive".
+    R = cfg.R if cfg.R is not None else cfg.risk_fraction * wealth
+
+    s4 = stage_decide(s3, tickers, wealth, R, t_df, cfg.seed, alloc)
+    s5 = stage_simulate(s4["recommended"]["weights"], s4["current"]["weights"],
+                        s3["mu"], s3["cov"], t_df, cfg.n_paths, cfg.seed,
+                        tail_study=cfg.tail_study)
+
+    cur = s4["current"]
+    return {
+        "data": d, "moments": m, "diagnostics": s2["diagnostics"],
+        "frontier": s4["frontier"], "frontier_naive": s3["frontier_naive"],
+        "max_weight": cfg.max_weight,
+        "min_variance": s3["min_variance"],
+        "recommended": s4["recommended"],
+        "current": {"weights": cur["weights"], "ce": cur["ce"],
+                    "covered": covered,
+                    **{k: v for k, v in cur.items() if k not in ("weights", "ce")}},
+        "mc_normal": s5["mc_normal"], "mc_t": s5["mc_t"],
+        "mc_current": s5["mc_current"], "sweep": s4["sweep"],
+        "tail_study": s5["tail_study"],
+        "tickers": tickers, "wealth": wealth, "R": R, "median_t_df": med_df,
+        "t_df": t_df, "estimates": cfg.estimates, "allocation": alloc,
+        "config": asdict(cfg),
+    }
+
+
+def print_report(out: dict, file=None) -> None:
+    """The CLI report, written from a finished `pipeline()` result."""
     def say(*a):
-        if not quiet:
-            print(*a)
+        print(*a, file=file)
+
+    cfg = out["config"]
+    d, m, diag = out["data"], out["moments"], out["diagnostics"]
+    tickers, min_days = out["tickers"], cfg["min_days"]
+    covered = out["current"]["covered"]
+    med_df, t_df = out["median_t_df"], out["t_df"]
+    fr_naive, fr, max_w = out["frontier_naive"], out["frontier"], out["max_weight"]
+    rec, cur = out["recommended"], out["current"]
+    wealth, R = out["wealth"], out["R"]
+    mc_n, mc_t, mc_cur = out["mc_normal"], out["mc_t"], out["mc_current"]
 
     say("=" * 78)
     say("CAPSTONE — Utility-Based Portfolio Optimizer")
     say("=" * 78)
 
     # ---- Layer 1 --------------------------------------------------------
-    d = load_returns(db_path, min_days=min_days)
-    rets, tickers = d["returns"], d["universe"]
     say(f"\nLAYER 1 — DATA (from SQLite, no live API calls)")
     say(f"  window            {d['start']} .. {d['end']}  ({d['n_days']} days)")
     say(f"  universe          {len(tickers)} assets "
@@ -504,15 +777,12 @@ def run(db_path=DB_PATH, wealth=None, R=None, seed=7, n_paths=100_000,
     if d["excluded"]:
         say(f"  excluded          {len(d['excluded'])} with < {min_days} days: "
             + ", ".join(f"{t}({n})" for t, n in sorted(d["excluded"].items())))
-
-    alloc = current_allocation(db_path)
-    covered = sum(alloc.get(t, 0.0) for t in tickers)
-    say(f"  current portfolio {len(alloc)} positions; "
+    if d.get("user_excluded"):
+        say(f"  removed by choice {', '.join(sorted(d['user_excluded']))}")
+    say(f"  current portfolio {len(out['allocation'])} positions; "
         f"{covered:.1%} of its value is modellable")
 
     # ---- Layer 2 --------------------------------------------------------
-    m = estimate_moments(rets)
-    mu, cov = m["mu"], m["cov"]
     say(f"\nLAYER 2 — STATISTICS")
     say(f"  observations/asset  {m['obs_per_asset']:.1f}")
     say(f"  mean shrinkage      {m['mean_shrinkage']:.1%} toward "
@@ -520,80 +790,52 @@ def run(db_path=DB_PATH, wealth=None, R=None, seed=7, n_paths=100_000,
     say(f"  covariance shrinkage {m['cov_shrinkage']:.1%} toward constant "
         f"correlation {m['avg_corr']:.2f}  (Ledoit-Wolf)")
     say(f"  condition number    {m['cond_number']:,.0f} -> {m['cond_robust']:,.0f}")
-    diag = normality_diagnostics(rets)
     n_fat = int((diag["best_fit"] != "Normal").sum())
     say(f"  normality check     {n_fat}/{len(diag)} assets reject the Normal "
         f"(median excess kurtosis {diag['excess_kurtosis'].median():.1f})")
-    med_df = float(diag["t_df"].median())
     say(f"  median fitted t df  {med_df:.1f}  -> drives the fat-tailed VaR below")
+    if cfg["t_df"] is not None:
+        say(f"  t df used instead   {t_df:.1f}  (set explicitly)")
 
     # ---- Layer 3 --------------------------------------------------------
     say(f"\nLAYER 3 — OPTIMIZATION (CVXPY, long-only, fully invested)")
-    from robust import min_variance_weights
-    max_w = 0.25
-
-    # The naive frontier is computed only to be shown failing. Markowitz on raw
-    # sample means is an error maximizer: it cannot distinguish a high expected
-    # return from a lucky one, so it concentrates on the noisiest estimates.
-    fr_naive = efficient_frontier(m["mu_naive"], m["cov_naive"])
-    fr = efficient_frontier(mu, cov, max_weight=max_w)
-
     say(f"  naive (raw sample estimates):")
     say(f"    return range      {fr_naive['ret'].min():.2%} .. {fr_naive['ret'].max():.2%}")
     say(f"    holdings at the aggressive end: "
         f"{int(fr_naive.iloc[-1]['n_holdings'])}")
-    say(f"  robust (shrunk estimates, max weight {max_w:.0%}):")
+    label = ("robust (shrunk estimates" if out["estimates"] == "robust"
+             else "recommendation frontier (raw sample estimates")
+    cap = f"max weight {max_w:.0%}" if max_w is not None else "no position cap"
+    say(f"  {label}, {cap}):")
     say(f"    return range      {fr['ret'].min():.2%} .. {fr['ret'].max():.2%}")
     say(f"    volatility range  {fr['vol'].min():.2%} .. {fr['vol'].max():.2%}")
     say(f"    holdings at the aggressive end: {int(fr.iloc[-1]['n_holdings'])}")
     best_sharpe = fr.loc[fr["sharpe"].idxmax()]
     say(f"    max Sharpe        {best_sharpe['sharpe']:.3f} at "
         f"ret {best_sharpe['ret']:.2%}, vol {best_sharpe['vol']:.2%}")
-
-    # A benchmark that uses NO expected-return estimates at all. If a mean-driven
-    # portfolio cannot beat this, the means were not carrying information.
-    w_mv = min_variance_weights(cov)
-    mv = describe(w_mv, mu, cov, tickers)
+    mv = out["min_variance"]
     say(f"  minimum-variance benchmark (uses no return estimates): "
         f"ret {mv['ret']:.2%}, vol {mv['vol']:.2%}, Sharpe {mv['sharpe']:.3f}")
 
     # ---- Layer 4 --------------------------------------------------------
-    # Default wealth is the portfolio's own market value, so the utility scale
-    # is anchored to the real money at stake rather than a round number.
-    if wealth is None:
-        wealth = float(portfolio_value(db_path))
-    # Default risk tolerance is a quarter of wealth. R is measured in dollars:
-    # setting R equal to wealth means being willing to stake essentially the
-    # whole portfolio on a coin flip, which is not what most people mean by
-    # "moderately aggressive".
-    if R is None:
-        R = 0.25 * wealth
-
     say(f"\nLAYER 4 — DECISION (certainty equivalent, R=${R:,.0f} = "
         f"{R/wealth:.0%} of wealth ${wealth:,.0f})")
-    ch = choose_portfolio(fr, mu, cov, wealth, R, t_df=med_df, seed=seed)
-    w_rec = ch["weights"]
-    rec = describe(w_rec, mu, cov, tickers)
-    say(f"  chosen gamma       {ch['gamma']:.3f}")
-    say(f"  certainty equiv    ${ch['ce']:,.0f}  (vs ${wealth:,.0f} held in cash)")
+    say(f"  chosen gamma       {rec['gamma']:.3f}")
+    say(f"  certainty equiv    ${rec['ce']:,.0f}  (vs ${wealth:,.0f} held in cash)")
     say(f"  recommended        ret {rec['ret']:.2%}, vol {rec['vol']:.2%}, "
         f"Sharpe {rec['sharpe']:.3f}, {rec['n_holdings']} holdings")
     for t, wt in rec["top"]:
         say(f"      {t:<6} {wt:6.2%}")
 
-    sweep = risk_tolerance_sweep(fr, mu, cov, tickers, wealth,
-                                 t_df=med_df, seed=seed)
     say(f"\n  How the recommendation moves with risk tolerance:")
     say(f"    {'R/wealth':>9}{'ret':>9}{'vol':>9}{'Sharpe':>9}{'held':>6}  top holdings")
-    for r in sweep.itertuples():
+    for r in out["sweep"].itertuples():
         mark = " <-" if abs(r.R - R) < 1e-6 else ""
         say(f"    {r.R_fraction:>8.0%}{r.ret:>9.1%}{r.vol:>9.1%}"
             f"{r.sharpe:>9.2f}{r.n_holdings:>6}  {r.top}{mark}")
 
     # ---- Layer 5 --------------------------------------------------------
-    say(f"\nLAYER 5 — MONTE CARLO (1 year forward, {n_paths:,} paths)")
-    mc_n = simulate_forward(w_rec, mu, cov, n_paths=n_paths, seed=seed)
-    mc_t = simulate_forward(w_rec, mu, cov, n_paths=n_paths, seed=seed, t_df=med_df)
+    say(f"\nLAYER 5 — MONTE CARLO (1 year forward, {cfg['n_paths']:,} paths)")
     say(f"  {'':22}{'normal':>12}{'student-t':>12}")
     for label, key, fmt in [("expected return", "mean", "{:.2%}"),
                             ("median return", "median", "{:.2%}"),
@@ -604,25 +846,20 @@ def run(db_path=DB_PATH, wealth=None, R=None, seed=7, n_paths=100_000,
                             ("1% CVaR", "cvar_1", "{:.2%}")]:
         say(f"  {label:<22}{fmt.format(mc_n[key]):>12}{fmt.format(mc_t[key]):>12}")
     say(f"  expected return 95% CI  [{mc_n['ci_low']:.2%}, {mc_n['ci_high']:.2%}]")
-    tail = horizon_tail_study(w_rec, mu, cov, med_df,
-                              n_paths=min(n_paths, 100_000), seed=seed)
-    say(f"\n  Where fat tails actually matter (1% VaR, normal vs t):")
-    say(f"    {'horizon':<10}{'normal':>10}{'t':>10}{'ratio':>9}")
-    for r in tail.itertuples():
-        say(f"    {r.horizon:<10}{r.var1_normal:>10.2%}{r.var1_t:>10.2%}"
-            f"{r.ratio:>9.2f}x")
-    say(f"    Fat tails dominate SHORT horizons. Over a year the return is a sum")
-    say(f"    of 252 draws and the CLT pulls it back toward normal, so the gap")
-    say(f"    closes. At long horizons the real danger is dependence — volatility")
-    say(f"    clustering, correlations rising in crashes — which this i.i.d.")
-    say(f"    simulation does not model and therefore understates.")
+    tail = out["tail_study"]
+    if tail is not None:
+        say(f"\n  Where fat tails actually matter (1% VaR, normal vs t):")
+        say(f"    {'horizon':<10}{'normal':>10}{'t':>10}{'ratio':>9}")
+        for r in tail.itertuples():
+            say(f"    {r.horizon:<10}{r.var1_normal:>10.2%}{r.var1_t:>10.2%}"
+                f"{r.ratio:>9.2f}x")
+        say(f"    Fat tails dominate SHORT horizons. Over a year the return is a sum")
+        say(f"    of 252 draws and the CLT pulls it back toward normal, so the gap")
+        say(f"    closes. At long horizons the real danger is dependence — volatility")
+        say(f"    clustering, correlations rising in crashes — which this i.i.d.")
+        say(f"    simulation does not model and therefore understates.")
 
     # ---- Comparison -----------------------------------------------------
-    w_cur = align_weights(alloc, tickers)
-    cur = describe(w_cur, mu, cov, tickers)
-    ce_cur = portfolio_certainty_equivalent(w_cur, mu, cov, wealth, R,
-                                            seed=seed, t_df=med_df)
-    mc_cur = simulate_forward(w_cur, mu, cov, n_paths=n_paths, seed=seed, t_df=med_df)
     say(f"\nRECOMMENDED vs ACTUAL "
         f"(actual covers {covered:.0%} of portfolio value)")
     say(f"  {'':24}{'actual':>14}{'recommended':>14}")
@@ -630,20 +867,21 @@ def run(db_path=DB_PATH, wealth=None, R=None, seed=7, n_paths=100_000,
     say(f"  {'volatility':<24}{cur['vol']:>13.2%}{rec['vol']:>14.2%}")
     say(f"  {'Sharpe':<24}{cur['sharpe']:>13.3f}{rec['sharpe']:>14.3f}")
     say(f"  {'holdings':<24}{cur['n_holdings']:>13}{rec['n_holdings']:>14}")
-    say(f"  {'certainty equivalent':<24}${ce_cur:>12,.0f}${ch['ce']:>13,.0f}")
+    say(f"  {'certainty equivalent':<24}${cur['ce']:>12,.0f}${rec['ce']:>13,.0f}")
     say(f"  {'P(loss > 10%)':<24}{mc_cur['p_loss_10']:>13.1%}{mc_t['p_loss_10']:>14.1%}")
     say(f"  {'5% VaR':<24}{mc_cur['var_5']:>13.2%}{mc_t['var_5']:>14.2%}")
 
-    return {
-        "data": d, "moments": m, "diagnostics": diag, "frontier": ch["frontier"],
-        "frontier_naive": fr_naive, "max_weight": max_w,
-        "min_variance": {"weights": w_mv, **mv},
-        "recommended": {"weights": w_rec, "gamma": ch["gamma"], "ce": ch["ce"], **rec},
-        "current": {"weights": w_cur, "ce": ce_cur, "covered": covered, **cur},
-        "mc_normal": mc_n, "mc_t": mc_t, "mc_current": mc_cur, "sweep": sweep,
-        "tail_study": tail,
-        "tickers": tickers, "wealth": wealth, "R": R, "median_t_df": med_df,
-    }
+
+def run(db_path=DB_PATH, wealth=None, R=None, seed=7, n_paths=100_000,
+        min_days=400, quiet=False):
+    """The CLI entry point: `pipeline()` with the default configuration, then
+    the report. Signature and return value are unchanged from before the
+    refactor; `export_results.py` and the tests depend on both."""
+    out = pipeline(PipelineConfig(db_path=db_path, wealth=wealth, R=R,
+                                  seed=seed, n_paths=n_paths, min_days=min_days))
+    if not quiet:
+        print_report(out)
+    return out
 
 
 def main():
