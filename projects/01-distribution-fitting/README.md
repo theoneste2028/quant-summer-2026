@@ -8,14 +8,17 @@ distributed; real returns have fat tails that understate crash risk. This
 project quantifies how non-normal my actual holdings really are.
 
 ## Approach
-- 5y daily log returns for GOOGL, PLTR, VRT, STX, SPY (yfinance).
+- 5y daily log returns for nine holdings: GOOGL, PLTR, VRT, STX, SPY, MU, IREN,
+  NBIS, TQQQ (yfinance).
 - Moments with a focus on excess kurtosis (0 = normal) and skewness.
 - Fit Normal, Student-t, Laplace by MLE; score with KS, log-likelihood, AIC.
 - Histograms with overlaid PDFs + Normal-vs-t QQ-plots.
 
 ## Results
 Student-t fits every ticker best (lowest AIC and KS); excess kurtosis is
-positive everywhere (fat tails); SPY has thinner tails than single stocks.
+positive everywhere (fat tails). Even SPY, the diversified index, has excess
+kurtosis near 8 — higher than most single names. Diversification lowers
+volatility, not tail shape.
 See `WEEK1_SUMMARY.md` and `results/`.
 
 ![Excess kurtosis](results/excess_kurtosis.png)
