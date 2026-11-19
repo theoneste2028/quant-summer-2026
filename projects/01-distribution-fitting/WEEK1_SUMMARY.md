@@ -1,7 +1,7 @@
 # Week 1 Summary — Distribution Fitting on Real Market Returns
 **Course:** IEMS 302 · **Author:** Tteddy · **Holdings analyzed:** GOOGL, PLTR, VRT, STX, SPY, MU, IREN, NBIS, TQQQ (up to 5 years of daily log returns)
 
-> All numbers below are real output from `distribution_fitting.py` on live yfinance data (run June 2026); the full table is auto-generated in `results/results_table.md`. Note NBIS (420 trading days) and IREN (1,154) have shorter listed histories than the ~1,254 days of the rest.
+> All numbers below are real output from `distribution_fitting.py` on live yfinance data (run August 2026); the full table is auto-generated in `results/results_table.md`. Note NBIS (450 trading days) and IREN (1,184) have shorter listed histories than the 1,253 days of the rest.
 
 ## Question
 Black-Scholes, Markowitz, and simple VaR all assume daily returns are **normally distributed**. This project tests that assumption directly on real holdings by fitting three distributions — Normal, Student-t, and Laplace — to daily log returns and comparing them with formal goodness-of-fit measures.
@@ -17,15 +17,15 @@ Black-Scholes, Markowitz, and simple VaR all assume daily returns are **normally
 
 | Ticker | Daily σ | Skew | Excess kurt. | t df | KS (Normal) | KS (t) | Best fit (AIC) |
 |:-------|:--------|-----:|-------------:|-----:|------------:|-------:|:---------------|
-| GOOGL  | 1.98%   |  0.02 |         3.2 |  4.4 |      0.0515 | 0.0160 | Student-t |
-| PLTR   | 4.08%   |  0.40 |         5.2 |  3.8 |      0.0637 | 0.0173 | Student-t |
-| VRT    | 4.01%   | −1.51 |        20.4 |  4.3 |      0.0723 | 0.0193 | Student-t |
-| STX    | 2.85%   |  0.13 |         4.9 |  3.9 |      0.0594 | 0.0124 | Student-t |
-| SPY    | 1.08%   |  0.15 |         8.0 |  3.8 |      0.0720 | 0.0233 | Student-t |
-| MU     | 3.42%   |  0.08 |         3.6 |  4.0 |      0.0625 | 0.0229 | Student-t |
-| IREN   | 7.27%   |  0.39 |         3.7 |  7.3 |      0.0404 | 0.0239 | Student-t |
-| NBIS   | 6.84%   | −0.17 |         7.3 |  6.0 |      0.0429 | 0.0258 | Student-t |
-| TQQQ   | 4.25%   | −0.23 |         3.6 |  4.3 |      0.0694 | 0.0257 | Laplace |
+| GOOGL  | 2.02%   |  0.01 |         3.0 |  4.4 |      0.0502 | 0.0162 | Student-t |
+| PLTR   | 4.16%   |  0.55 |         5.8 |  3.6 |      0.0653 | 0.0143 | Student-t |
+| VRT    | 4.09%   | −1.49 |        19.1 |  4.4 |      0.0717 | 0.0181 | Student-t |
+| STX    | 2.97%   |  0.08 |         4.5 |  3.7 |      0.0610 | 0.0116 | Student-t |
+| SPY    | 1.08%   |  0.15 |         7.9 |  3.9 |      0.0724 | 0.0230 | Student-t |
+| MU     | 3.53%   |  0.11 |         3.5 |  3.8 |      0.0647 | 0.0232 | Student-t |
+| IREN   | 7.30%   |  0.42 |         3.6 |  7.1 |      0.0426 | 0.0248 | Student-t |
+| NBIS   | 7.07%   | −0.13 |         6.1 |  5.5 |      0.0438 | 0.0225 | Student-t |
+| TQQQ   | 4.30%   | −0.21 |         3.4 |  4.7 |      0.0678 | 0.0252 | Student-t |
 
 ![Excess kurtosis by ticker](results/excess_kurtosis.png)
 
@@ -34,11 +34,11 @@ The single clearest evidence is the QQ-plot: against a Normal, the points form a
 ![PLTR QQ-plots](results/PLTR_qq.png)
 
 ## What the numbers mean
-- **Every ticker has positive excess kurtosis** (3.2 up to VRT's 20.4): fat tails are not an exception, they're the norm. Extreme daily moves happen far more often than a Normal predicts.
-- **A fat-tailed distribution wins on AIC for every name** — Student-t for 8 of 9, Laplace for TQQQ — with a KS statistic 2–5× smaller than the Normal's, even after the t's extra-parameter penalty. The Normal never wins.
-- **Low degrees of freedom (~3.8–4.4 for the long-history names)** confirm heavy tails (the t approaches the Normal only as df → ∞). IREN (7.3) and NBIS (6.0) show higher df, but their shorter histories give less data on rare extremes.
-- **Even SPY — the diversified index — has heavy tails** (excess kurtosis 8.0, t df 3.8, a window that includes the 2022 bear market and 2025 drawdowns). Diversification slashes day-to-day volatility (σ 1.08% vs 2–7% for single names) but does not normalize the tail shape.
-- **Skew is name-specific in this sample**: most tickers sit near zero or slightly positive, while VRT's −1.51 shows how a few violent down days can dominate the third moment.
+- **Every ticker has positive excess kurtosis** (3.0 up to VRT's 19.1): fat tails are not an exception, they're the norm. Extreme daily moves happen far more often than a Normal predicts.
+- **Student-t wins on AIC for all nine names**, with a KS statistic 1.7–5.3× smaller than the Normal's, even after the t's extra-parameter penalty. The Normal never wins. TQQQ is the closest call: the t beats the Laplace by only about half an AIC point (it went to the Laplace in the June run), so for that name the two fat-tailed fits are effectively tied.
+- **Low degrees of freedom (~3.6–4.7 for the long-history names)** confirm heavy tails (the t approaches the Normal only as df → ∞). IREN (7.1) and NBIS (5.5) show higher df, but their shorter histories give less data on rare extremes.
+- **Even SPY — the diversified index — has heavy tails** (excess kurtosis 7.9, second only to VRT, and t df 3.9, over a window that includes the 2022 bear market and 2025 drawdowns). Diversification slashes day-to-day volatility (σ 1.08% vs 2–7% for single names) but does not normalize the tail shape.
+- **Skew is name-specific in this sample**: most tickers sit near zero or slightly positive, while VRT's −1.49 shows how a few violent down days can dominate the third moment.
 
 ## Caveat (honest limitation)
 Because each distribution's parameters were estimated from the same data used to test it, the KS **p-values are not strictly valid** (the Lilliefors problem). This doesn't affect the conclusion: KS and AIC are used here to **rank** the three distributions against each other, and that ranking is robust.
