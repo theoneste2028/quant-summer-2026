@@ -18,21 +18,22 @@ Normal, the Student-t, and the Laplace. Then I scored the fits three ways — th
 Kolmogorov–Smirnov statistic, the log-likelihood, and AIC, which penalises the
 Student-t for having an extra parameter so it cannot win on flexibility alone.
 
-The Normal lost every time. Not narrowly — on eight of nine tickers the
-Student-t fitted best, and on the ninth the Laplace did. The KS statistic for
-the t was typically three to five times smaller than for the Normal.
+The Normal lost every time. Not narrowly — the Student-t fitted best on all
+nine tickers, even after the AIC penalty. The KS statistic for the t was
+typically about three times smaller than for the Normal, and up to five times
+smaller.
 
 The number that says why is **excess kurtosis**, which measures how much
 probability lives in the tails relative to a bell curve. A Normal has excess
-kurtosis of zero by construction. My holdings ranged from 3.2 to 20.4. VRT, the
-worst offender, had a skew of −1.51 and excess kurtosis of 20.4, meaning its
+kurtosis of zero by construction. My holdings ranged from 3.0 to 19.1. VRT, the
+worst offender, had a skew of −1.49 and excess kurtosis of 19.1, meaning its
 crash days are both more frequent and more violent than any normal model would
 ever generate.
 
 The most useful surprise was SPY. I expected the diversified index to be close
 to normal — that is the standard intuition, and diversification is supposed to
-average away extremes. Its excess kurtosis was 8.0, higher than six of the eight
-individual stocks, with fitted degrees of freedom of 3.8. Diversification
+average away extremes. Its excess kurtosis was 7.9, higher than seven of the
+other eight tickers, with fitted degrees of freedom of 3.9. Diversification
 crushed the day-to-day volatility (1.08% daily standard deviation against 2–7%
 for single names) and did essentially nothing to the *shape* of the tail. Those
 are two different kinds of risk, and only one of them responds to holding more
