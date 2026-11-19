@@ -3,14 +3,30 @@
 A 12-week quantitative finance platform built to consolidate three Northwestern
 courses, ending in a portfolio optimizer that runs on a real brokerage history.
 
-**525 tests across 10 suites, all passing.** `python run_all_tests.py`
+**Status:** complete — all 12 weeks · **603 tests across 11 suites, all passing**
+(`python run_all_tests.py`)
 
-| Course | Topic | Weeks |
-|---|---|---|
-| IEMS 302 | Probability | 1–4 · distribution fitting, simulation, Monte Carlo pricing, Bayesian updating |
-| CS 217 | Data Management | 5–8 · portfolio database, SQL analytics, ETL, query optimization |
-| CivEnv 205 | Economics & Finance | 9–10 · capital budgeting, decision analysis, utility theory |
-| Capstone | All three | 11–12 · utility-based portfolio optimizer |
+📊 **[Live results page](site/capstone.html)** — self-contained, no build step.
+
+## Contents
+
+- [Course map](#course-map)
+- [The capstone](#the-capstone)
+- [Projects](#projects)
+- [Writeups and docs](#writeups-and-docs)
+- [Getting started](#getting-started)
+- [Repository layout](#repository-layout)
+- [Three things I got wrong](#three-things-i-got-wrong)
+- [A note on the data](#a-note-on-the-data)
+
+## Course map
+
+| Phase | Course | Weeks | Topics |
+|---|---|---|---|
+| 1 | IEMS 302 · Probability | 1–4 | Distribution fitting, simulation, Monte Carlo pricing, Bayesian updating |
+| 2 | CS 217 · Data Management | 5–8 | Portfolio database, SQL analytics, ETL, query optimization |
+| 3 | CivEnv 205 · Economics & Finance | 9–10 | Capital budgeting, decision analysis, utility theory |
+| 4 | Capstone · all three | 11–12 | Utility-based portfolio optimizer |
 
 ## The capstone
 
@@ -35,38 +51,53 @@ Five layers, each drawing on a different phase:
   └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Result:** against the actual portfolio, the recommendation cuts volatility 62%
-(65.9% → 25.3%), raises the Sharpe ratio 55% (0.64 → 1.00), and makes a >10%
-loss roughly a third as likely (32.0% → 9.8%) — for 17 points less expected
-return.
+### Result
 
-📊 **[Live results page](site/capstone.html)** — self-contained, no build step.
+The recommended portfolio against the actual one (1-year horizon, fat-tailed
+simulation):
+
+| Metric | Current | Recommended | Change |
+|---|---:|---:|---|
+| Volatility | 65.9% | 25.3% | −62% |
+| Sharpe ratio | 0.64 | 1.00 | +55% |
+| P(loss > 10%) | 32.0% | 9.8% | about a third as likely |
+| Expected return | 42.3% | 25.2% | −17 points |
 
 ## Projects
 
 | # | Project | Key result |
 |---|---|---|
-| 01 | [Distribution fitting](projects/01-distribution-fitting) | ✅ Fat-tailed fits beat Normal on all 9 tickers; SPY excess kurtosis 8.0 |
-| 02 | [Blackjack probability engine](projects/02-blackjack-probability) | ✅ Exact vs 1M-trial simulation agree to ~0.001 across 12 quantities |
-| 03 | [Monte Carlo option pricer](projects/03-monte-carlo-pricer) | ✅ Black-Scholes inside the 95% CI on all 12 cases; error slope −0.500 |
-| 04 | [Options extensions + Bayes](projects/04-options-extensions) | ✅ Antithetic variates cut variance 1.66×; common random numbers cut Greek noise 74× |
-| 05–06 | [Portfolio database + SQL analytics](projects/05-portfolio-database) | ✅ FIFO lot matching in pure SQL; found 41.5% hidden leveraged-ETF concentration |
-| 07 | [ETL pipeline + SQL/NoSQL](projects/07-etl-pipeline) | ✅ Validated, transactional, idempotent; 6 of 7 queries identical across both stores |
-| 08 | [Query optimization study](projects/08-query-optimization) | ✅ 10.0× speed-up on 2.96M rows — and one query where indexes bought 1.4× |
-| 09 | [Capital budgeting](projects/09-capital-budgeting) | ✅ Detects multiple IRRs (25% and 400%); break-even at −31.5% production |
-| 10 | [Decision analysis](projects/10-decision-analysis) | ✅ EVPI $355,500 caps study value; real seismic survey worth $214,750 |
-| 11–12 | [Capstone platform](projects/11-capstone-platform) | ✅ Shrinkage cuts covariance conditioning 23×; Sharpe 0.64 → 1.00 |
+| 01 | [Distribution fitting](projects/01-distribution-fitting) | Fat-tailed fits beat Normal on all 9 tickers; even SPY has excess kurtosis ≈ 8 |
+| 02 | [Blackjack probability engine](projects/02-blackjack-probability) | Exact vs 1M-trial simulation agree to ~0.001 across 12 quantities |
+| 03 | [Monte Carlo option pricer](projects/03-monte-carlo-pricer) | Black-Scholes inside the 95% CI on all 12 cases; error slope −0.500 |
+| 04 | [Options extensions + Bayes](projects/04-options-extensions) | Antithetic variates cut variance 1.66×; common random numbers cut Greek noise 74× |
+| 05–06 | [Portfolio database + SQL analytics](projects/05-portfolio-database) | FIFO lot matching in pure SQL; found 41.5% hidden leveraged-ETF concentration |
+| 07 | [ETL pipeline + SQL/NoSQL](projects/07-etl-pipeline) | Validated, transactional, idempotent; 6 of 7 queries identical across both stores |
+| 08 | [Query optimization study](projects/08-query-optimization) | 10.0× speed-up on 2.96M rows — and one query where indexes bought only 1.4× |
+| 09 | [Capital budgeting](projects/09-capital-budgeting) | Detects multiple IRRs (25% and 400%); break-even at −31.5% production |
+| 10 | [Decision analysis](projects/10-decision-analysis) | EVPI $355,500 caps study value; real seismic survey worth $214,750 |
+| 11–12 | [Capstone platform](projects/11-capstone-platform) | Shrinkage cuts covariance conditioning 23×; Sharpe 0.64 → 1.00 |
 
-## Writeups
+Each project folder holds its code, tests, `results/`, and a weekly summary.
 
-Longer-form, one per phase:
+## Writeups and docs
+
+Long-form writeups, one per phase:
 
 - [Phase 1 — The distribution nobody checks](writeups/phase-1-probability.md)
 - [Phase 2 — The database found bugs I could not see](writeups/phase-2-data-management.md)
 - [Phase 3 — Expected value is the wrong rule](writeups/phase-3-decisions.md)
 - [Phase 4 — The optimizer told me exactly what I wanted to hear](writeups/phase-4-capstone.md)
 
-## Setup
+Reference:
+
+- [User manual](docs/USER_MANUAL.docx) — written for a reader with no finance or programming background
+- [Original 12-week plan](docs/PLAN.md)
+- [Presenting this project](writeups/PRESENTING.md) — talking points and a pre-demo checklist
+
+## Getting started
+
+### Install
 
 ```bash
 git clone https://github.com/theoneste2028/quant-summer-2026.git
@@ -75,30 +106,37 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Then build the database from a brokerage export and run the capstone:
+### Run on your own brokerage history
 
 ```bash
 python projects/05-portfolio-database/build_db.py ~/Downloads/Accounts_History.csv
 python projects/11-capstone-platform/capstone.py
 ```
 
-No brokerage export? Every project runs on synthetic or public data:
+### Run without one
+
+Every project also runs on synthetic or public data:
 
 ```bash
 python projects/05-portfolio-database/build_db.py --demo   # offline sample DB
 python projects/08-query-optimization/load_taxi.py         # public NYC taxi data
-python run_all_tests.py                                    # all 525 checks
+```
+
+### Test
+
+```bash
+python run_all_tests.py                                    # all 603 checks, ~30 s
 ```
 
 ## Repository layout
 
 ```
-projects/       One folder per project: code, tests, results, weekly writeup
-writeups/       Long-form writeup per phase
-site/           JSON export + self-contained results page
-docs/PLAN.md    The original 12-week plan
-data/           Databases and market data (gitignored — contains real trades)
-run_all_tests.py
+projects/          One folder per project: code, tests, results, weekly summary
+writeups/          Long-form writeup per phase + presentation notes
+site/              JSON export + self-contained results page
+docs/              Original plan and user manual (with its build scripts)
+data/              Databases and market data (gitignored — contains real trades)
+run_all_tests.py   Runs every test suite and prints a summary
 ```
 
 ## Three things I got wrong
