@@ -106,10 +106,10 @@ defending one guess:
 
 |  | Normal | Student-t |
 |:--|--:|--:|
-| Expected return | 28.6% | 28.9% |
+| Expected return | 28.4% | 29.1% |
 | P(loss > 10%) | 10.0% | 9.8% |
-| 5% VaR | 17.8% | 17.8% |
-| 1% VaR | 30.8% | 30.8% |
+| 5% VaR | 18.0% | 17.7% |
+| 1% VaR | 31.0% | 30.8% |
 
 Having spent Week 1 establishing fat tails, I expected the t model to give a
 markedly worse VaR. It did not.

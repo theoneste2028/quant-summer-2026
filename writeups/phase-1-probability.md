@@ -47,7 +47,7 @@ combinatorics and a conditional-probability recursion, and approximately, by
 simulating a million hands.
 
 The point was not blackjack. The point was calibration. When your analytical
-answer and your simulated answer agree to three decimal places across ten
+answer and your simulated answer agree to three decimal places across twelve
 different quantities, you have learned something about your simulator that you
 cannot learn any other way — and you need that confidence later, when you reach
 problems where no analytical answer exists to check against.

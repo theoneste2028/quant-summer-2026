@@ -71,7 +71,7 @@ simulation):
 | 02 | [Blackjack probability engine](projects/02-blackjack-probability) | Exact vs 1M-trial simulation agree to ~0.001 across 12 quantities |
 | 03 | [Monte Carlo option pricer](projects/03-monte-carlo-pricer) | Black-Scholes inside the 95% CI on all 12 cases; error slope −0.500 |
 | 04 | [Options extensions + Bayes](projects/04-options-extensions) | Antithetic variates cut variance 1.66×; common random numbers cut Greek noise 74× |
-| 05–06 | [Portfolio database + SQL analytics](projects/05-portfolio-database) | FIFO lot matching in pure SQL; found 41.5% hidden leveraged-ETF concentration |
+| 05–06 | [Portfolio database + SQL analytics](projects/05-portfolio-database) | FIFO lot matching in pure SQL; found 44.0% hidden leveraged-ETF concentration |
 | 07 | [ETL pipeline + SQL/NoSQL](projects/07-etl-pipeline) | Validated, transactional, idempotent; 6 of 7 queries identical across both stores |
 | 08 | [Query optimization study](projects/08-query-optimization) | 10.0× speed-up on 2.96M rows — and one query where indexes bought only 1.4× |
 | 09 | [Capital budgeting](projects/09-capital-budgeting) | Detects multiple IRRs (25% and 400%); break-even at −31.5% production |

@@ -43,7 +43,7 @@ P(up tomorrow) with a Beta prior, updated daily by conjugacy: posterior = Beta(�
 
 ![Bayesian posterior](results/bayes_posterior.png)
 
-The posterior starts wide (little data → low confidence) and visibly narrows as days accumulate; the 95% credible interval shrank from width 0.50 (day 10) to 0.11 (final). This is Bayes' Rule made into a living estimate — and a direct echo of Week 1's lesson that a point estimate hides how sure you should be.
+The posterior starts wide (little data → low confidence) and visibly narrows as days accumulate; on 499 days of live GOOGL data the 95% credible interval shrank from width 0.50 (day 10) to 0.087 (final), around a posterior mean of 0.531. This is Bayes' Rule made into a living estimate — and a direct echo of Week 1's lesson that a point estimate hides how sure you should be.
 
 ## What I learned
 - Building on validated code (importing `pricer.py`) instead of rewriting is what makes the harder problems tractable — and it's the design that makes the Week 11 capstone possible.

@@ -2,8 +2,8 @@
 **Course:** CS 217 · **Author:** Tteddy
 
 > All numbers below are real output from `dashboard.py` running `sql/queries.sql`
-> against the rebuilt portfolio database (555 trades, 62 securities, 28,133
-> price rows, 18 dividend rows; prices through 2026-07-24).
+> against the rebuilt portfolio database (555 trades, 67 securities, 31,291
+> price rows, 18 dividend rows; prices through 2026-08-10).
 
 ## Question
 Week 5 turned brokerage exports into a constrained, queryable database. That
@@ -78,12 +78,12 @@ scale is withheld.
 | Measure | Indexed |
 |:--|--:|
 | Open positions | 14 |
-| Cost basis (FIFO) | 120.8 |
+| Cost basis (FIFO) | 110.6 |
 | Market value | 100.0 |
-| Unrealized P&L | −20.8 |
-| Realized P&L (FIFO, net of fees) | +8.7 |
+| Unrealized P&L | −10.6 |
+| Realized P&L (FIFO, net of fees) | +7.9 |
 | Dividend & interest income | +0.2 |
-| **Total P&L** | **−12.0** |
+| **Total P&L** | **−2.4** |
 
 Realized trading has been profitable across 57 tickers with closed round trips.
 The best four by return on closed cost: NBIS +11.9% (5 round trips), MU +5.9%
@@ -98,19 +98,19 @@ open positions.
 
 | Sector | Holdings | % of portfolio |
 |:--|--:|--:|
-| Trading–Leveraged Equity | 7 | 41.5% |
-| Technology | 2 | 29.7% |
-| Industrials | 2 | 16.5% |
-| Communication Services | 2 | 10.2% |
-| Real Estate | 1 | 2.1% |
+| Trading–Leveraged Equity | 7 | 44.0% |
+| Technology | 2 | 27.2% |
+| Industrials | 2 | 17.5% |
+| Communication Services | 2 | 9.5% |
+| Real Estate | 1 | 1.8% |
 
 Two facts fall out that no brokerage screen was showing. First, leveraged 2x
-ETFs are the single largest exposure at 41.5% across seven positions — a
+ETFs are the single largest exposure at 44.0% across seven positions — a
 concentration that is invisible when each one is viewed individually. Second,
 those same instruments hold the four largest unrealized losses in the book
-(LUNL −72%, ASTX −69%, NVTX −57%, EOSE −45%), which is the volatility-decay
+(LUNL −61%, ASTX −55%, NVTX −40%, NBIG −37%), which is the volatility-decay
 behaviour daily-rebalanced leveraged funds exhibit over multi-week holds.
-Meanwhile the single largest gain is MU at +141%.
+Meanwhile the single largest gain is MU at +128%.
 
 This is the payoff of owning the data: the question "how much of my money is in
 one kind of instrument" is one line of SQL, and nobody else's app was going to

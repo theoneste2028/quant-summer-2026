@@ -17,7 +17,7 @@ Week 3 pricer to handle all three, plus a Bayesian estimate that learns from dat
 ## Results
 Asian < European (13.05 vs 23.29); antithetic gives ~1.66x variance reduction;
 finite-diff Greeks match BS to ~3 decimals; Bayesian credible interval narrows
-from 0.50 to 0.11. See `WEEK4_SUMMARY.md` and `results/`.
+from 0.50 to 0.087. See `WEEK4_SUMMARY.md` and `results/`.
 
 ![Bayesian posterior](results/bayes_posterior.png)
 

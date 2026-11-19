@@ -145,7 +145,7 @@ where the document world hands the relational world a clean, typed fact.
 ```bash
 crontab -e
 # Weekdays at 18:30, after the US close has settled:
-30 18 * * 1-5 cd ~/Desktop/summer_26_proj/quant-summer-2026 && \
+30 18 * * 1-5 cd ~/Desktop/projects/quant-summer-2026 && \
   .venv/bin/python projects/07-etl-pipeline/etl.py --quiet >> \
   projects/07-etl-pipeline/logs/cron.log 2>&1
 ```

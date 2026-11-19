@@ -87,14 +87,14 @@ disagree.
 ## What the analytics actually showed
 
 Once the data was trustworthy: 14 open positions, and — indexing to market
-value = 100 — a cost basis of 120.8, realised P&L of +8.7 across 57 tickers with
-closed round trips, against −20.8 unrealised.
+value = 100 — a cost basis of 110.6, realised P&L of +7.9 across 57 tickers with
+closed round trips, against −10.6 unrealised.
 
-The sector query surfaced something no brokerage screen had shown me: **41.5% of
+The sector query surfaced something no brokerage screen had shown me: **44.0% of
 the portfolio sat in leveraged 2× ETFs**, spread across seven separate
 positions. Individually each looked like a modest holding. Aggregated, it was
 the single largest exposure in the book — and those same instruments held the
-four largest unrealised losses, at −72%, −69%, −57% and −45%. That is the
+four largest unrealised losses, at −61%, −55%, −40% and −37%. That is the
 volatility-decay behaviour daily-rebalanced leveraged funds exhibit over
 multi-week holds, and it was invisible until the data was in one place and I
 could ask a question nobody had built a screen for.

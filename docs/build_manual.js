@@ -690,7 +690,7 @@ const part5 = [
 
   SPACER(120),
 
-  P("This is where the project found that 41.5% of the portfolio sat in one kind of high-risk instrument, spread across seven separate holdings — a concentration invisible when each is viewed on its own."),
+  P("This is where the project found that 44.0% of the portfolio sat in one kind of high-risk instrument, spread across seven separate holdings — a concentration invisible when each is viewed on its own."),
 
   H2("5.7 Transaction safety demonstration"),
 
@@ -801,11 +801,11 @@ const part6 = [
   H2("6.5 Stage 5 — Simulation"),
 
   CODE([
-    "  expected return             28.57%      28.89%",
-    "  P(loss)                      19.4%       19.2%",
-    "  P(loss > 10%)                10.0%        9.9%",
-    "  5% VaR                      17.80%      17.79%",
-    "  1% VaR                      30.82%      30.94%",
+    "  expected return             28.42%      29.14%",
+    "  P(loss)                      19.3%       19.1%",
+    "  P(loss > 10%)                10.0%        9.8%",
+    "  5% VaR                      18.01%      17.72%",
+    "  1% VaR                      31.00%      30.76%",
   ]),
 
   SPACER(140),
